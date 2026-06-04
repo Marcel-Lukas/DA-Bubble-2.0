@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Firestore, collectionData, collection } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, query } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { User } from '../../../../shared/interfaces/user.interface';
@@ -45,7 +45,8 @@ export class DirectMessageComponent implements OnInit {
 
   loadUsers(): void {
     const usersCollection = collection(this.firestore, 'users');
-    const users$ = collectionData(usersCollection, { idField: 'uId' }).pipe(
+    const usersQuery = query(usersCollection);
+    const users$ = collectionData(usersQuery, { idField: 'uId' }).pipe(
       map((users: any[]) => users.map(user => user as User))
     );
     this.activeUsers$ = users$.pipe(

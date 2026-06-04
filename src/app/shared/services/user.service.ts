@@ -10,6 +10,7 @@ import {
   updateDoc,
   setDoc,
   serverTimestamp,
+  query,
 } from '@angular/fire/firestore';
 import { User } from '../interfaces/user.interface';
 import { Observable, map } from 'rxjs';
@@ -94,7 +95,8 @@ export class UserService {
 
   getEveryUsers(): Observable<User[]> {
     const usersCollection = collection(this.firestore, 'users');
-    return collectionData(usersCollection, { idField: 'uId' }) as Observable<User[]>;
+    const usersQuery = query(usersCollection);
+    return collectionData(usersQuery, { idField: 'uId' }) as Observable<User[]>;
   }
 
   async editLastReactions(
@@ -158,7 +160,8 @@ export class UserService {
 
   getUserById(userId: string): Observable<User | undefined> {
     const usersCollection = collection(this.firestore, 'users');
-    return collectionData(usersCollection, { idField: 'uId' }).pipe(
+    const usersQuery = query(usersCollection);
+    return collectionData(usersQuery, { idField: 'uId' }).pipe(
       map((users: any[]) =>
         users.find((user) => user.uId === userId)
       )
