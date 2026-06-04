@@ -123,7 +123,7 @@ export class ChannelService {
     await updateDoc(channelRef, { cDescription: newDescription });
   }
 
-  getSortedChannels(userId: string | null): Observable<{ id: string; name: string; createdAt: any }[]> {
+  getSortedChannels(userId: string | null): Observable<{ id: string; name: string; createdAt: any; createdBy: string }[]> {
     return runInInjectionContext(this.injector, () => {
       const channelsRef  = collection(this.firestore, 'channels');
       const channelQuery = query(channelsRef, where('cUserIds', 'array-contains', userId));
@@ -135,6 +135,7 @@ export class ChannelService {
               id:        ch.id,
               name:      ch.cName,
               createdAt: ch.createdAt || 0,
+              createdBy: ch.cCreatedByUser,
             }))
             .sort((a, b) => a.name.localeCompare(b.name, 'de', { sensitivity: 'base' }))
         )
@@ -149,7 +150,27 @@ export class ChannelService {
   }
   
 
-  deleteChannel(channelId: string): Promise<void> {
+  /**
+   * Prüft, ob der angegebene Nutzer der Ersteller/Owner des Channels ist.
+   */
+  async isChannelOwner(channelId: string, userId: string | null): Promise<boolean> {
+    if (!channelId || !userId) return false;
+    const channelRef = doc(this.firestore, 'channels', channelId);
+    const snap = await getDoc(channelRef);
+    if (!snap.exists()) return false;
+    return (snap.data() as Channel).cCreatedByUser === userId;
+  }
+
+  /**
+   * Löscht einen Channel. Nur der Ersteller/Owner darf den Channel löschen.
+   * Wird ein anderer Nutzer übergeben, wird das Löschen verweigert.
+   */
+  async deleteChannel(channelId: string, requestingUserId: string | null): Promise<void> {
+    if (!channelId) return;
+    const isOwner = await this.isChannelOwner(channelId, requestingUserId);
+    if (!isOwner) {
+      throw new Error('Nur der Ersteller des Channels darf diesen löschen.');
+    }
     const channelRef = doc(this.firestore, 'channels', channelId);
     return deleteDoc(channelRef);
   }

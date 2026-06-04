@@ -17,6 +17,8 @@ export class PermanentDeleteComponent {
 
   @Input({ required: true }) target!: DeleteTarget;
   @Input({ required: true }) id!: any;
+  /** Id des aktuell angemeldeten Nutzers – wird zur Owner-Prüfung beim Löschen eines Channels benötigt. */
+  @Input() requestingUserId: string | null = null;
 
   @Output() close = new EventEmitter<void>();
 
@@ -37,12 +39,12 @@ export class PermanentDeleteComponent {
 
       case 'channel':
         this.channelService
-          .deleteChannel(this.id)
+          .deleteChannel(this.id, this.requestingUserId)
           .then(() => this.close.emit())
-          .catch((err) =>
-            console.error('Fehler beim Löschen des Channels', err)
-          );
-        this.close.emit();
+          .catch((err) => {
+            console.error('Fehler beim Löschen des Channels', err);
+            this.close.emit();
+          });
         break;
       default:
         console.warn('Unbekannter Lösch‑Typ:', this.target);
