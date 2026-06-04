@@ -161,13 +161,15 @@ export class AuthentificationService {
    */
   private async cleanupOrphanedGuests(currentUid: string): Promise<void> {
     try {
-      const usersCollection = collection(this.firestore, 'users');
-      const guestQuery = query(usersCollection, where('uEmail', '==', ''));
-      const snapshot = await getDocs(guestQuery);
-      const deletions = snapshot.docs
-        .filter((docSnap) => docSnap.id !== currentUid)
-        .map((docSnap) => deleteDoc(doc(usersCollection, docSnap.id)));
-      await Promise.all(deletions);
+      await this.runInContext(async () => {
+        const usersCollection = collection(this.firestore, 'users');
+        const guestQuery = query(usersCollection, where('uEmail', '==', ''));
+        const snapshot = await getDocs(guestQuery);
+        const deletions = snapshot.docs
+          .filter((docSnap) => docSnap.id !== currentUid)
+          .map((docSnap) => deleteDoc(doc(usersCollection, docSnap.id)));
+        await Promise.all(deletions);
+      });
     } catch (cleanupErr) {
       console.warn('Bereinigung alter Gast-Dokumente fehlgeschlagen', cleanupErr);
     }
