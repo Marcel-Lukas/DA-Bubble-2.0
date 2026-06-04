@@ -67,10 +67,8 @@ export class AuthentificationService {
   
     const { email, password, username } = this.registrationData;
   
-    const userCredential = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      password
+    const userCredential = await this.runInContext(() =>
+      createUserWithEmailAndPassword(this.auth, email, password)
     );
     const uid = userCredential.user.uid;
   
@@ -100,63 +98,57 @@ export class AuthentificationService {
   }
 
   async loginWithEmail(email: string, password: string): Promise<void | UserCredential> {
-    return signInWithEmailAndPassword(this.auth, email, password)
-    .then(async (result) => {
+    return this.runInContext(async () => {
+      const result = await signInWithEmailAndPassword(this.auth, email, password);
       this.currentUid = result.user.uid;
-      await this.runInContext(async () => {
-        const userRef = collection(this.firestore, 'users');
-        const userDocRef = doc(userRef, this.currentUid!);
-        await updateDoc(userDocRef, { uStatus: true });
-      });
+      const userRef = collection(this.firestore, 'users');
+      const userDocRef = doc(userRef, this.currentUid!);
+      await updateDoc(userDocRef, { uStatus: true });
       return result;
     });
   }
 
   async loginWithGoogle(): Promise<void | UserCredential> {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(this.auth, provider)
-    .then(async (result) => {
+    return this.runInContext(async () => {
+      const result = await signInWithPopup(this.auth, provider);
       this.currentUid = result.user.uid;
-      await this.runInContext(async () => {
-        const userData: UserInterface = {
-          uId: this.currentUid!,
-          uName: result.user.displayName || '',
-          uEmail: result.user.email || '',
-          uUserImage: result.user.photoURL || 'assets/img/profile.png',
-          uStatus: true,
-          uLastReactions: ['👍', '😊']
-        };
-        const userRef = collection(this.firestore, 'users');
-        const userDocRef = doc(userRef, result.user.uid);
-        await setDoc(userDocRef, userData, { merge: true });
-        const defaultChannelId = '4ViNXTttFDYKlytrxQw4';
-        const channelRef = doc(this.firestore, 'channels', defaultChannelId);
-        await updateDoc(channelRef, { cUserIds: arrayUnion(this.currentUid) });
-      });
+      const userData: UserInterface = {
+        uId: this.currentUid!,
+        uName: result.user.displayName || '',
+        uEmail: result.user.email || '',
+        uUserImage: result.user.photoURL || 'assets/img/profile.png',
+        uStatus: true,
+        uLastReactions: ['👍', '😊']
+      };
+      const userRef = collection(this.firestore, 'users');
+      const userDocRef = doc(userRef, result.user.uid);
+      await setDoc(userDocRef, userData, { merge: true });
+      const defaultChannelId = '4ViNXTttFDYKlytrxQw4';
+      const channelRef = doc(this.firestore, 'channels', defaultChannelId);
+      await updateDoc(channelRef, { cUserIds: arrayUnion(this.currentUid) });
       return result;
     });
   }
 
   async loginAsGuest(): Promise<void | UserCredential> {
-    return signInAnonymously(this.auth)
-    .then(async (result) => {
+    return this.runInContext(async () => {
+      const result = await signInAnonymously(this.auth);
       this.currentUid = result.user.uid;
-      await this.runInContext(async () => {
-        const guestData: UserInterface = {
-          uId: this.currentUid!,
-          uName: 'Gast',
-          uEmail: '',
-          uUserImage: 'assets/img/profile.png',
-          uStatus: true,
-          uLastReactions: ['👍', '😊']
-        };
-        const userRef = collection(this.firestore, 'users');
-        const userDocRef = doc(userRef, this.currentUid!);
-        await setDoc(userDocRef, guestData, { merge: true });
-        const defaultChannelId = '4ViNXTttFDYKlytrxQw4';
-        const channelRef = doc(this.firestore, 'channels', defaultChannelId);
-        await updateDoc(channelRef, { cUserIds: arrayUnion(this.currentUid) });
-      });
+      const guestData: UserInterface = {
+        uId: this.currentUid!,
+        uName: 'Gast',
+        uEmail: '',
+        uUserImage: 'assets/img/profile.png',
+        uStatus: true,
+        uLastReactions: ['👍', '😊']
+      };
+      const userRef = collection(this.firestore, 'users');
+      const userDocRef = doc(userRef, this.currentUid!);
+      await setDoc(userDocRef, guestData, { merge: true });
+      const defaultChannelId = '4ViNXTttFDYKlytrxQw4';
+      const channelRef = doc(this.firestore, 'channels', defaultChannelId);
+      await updateDoc(channelRef, { cUserIds: arrayUnion(this.currentUid) });
       return result;
     });
   }

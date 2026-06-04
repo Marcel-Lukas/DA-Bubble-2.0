@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, Injector, runInInjectionContext } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
@@ -19,8 +19,11 @@ export const authGuard: CanActivateFn = async (): Promise<boolean | UrlTree> => 
   const auth = inject(Auth);
   const authService = inject(AuthentificationService);
   const router = inject(Router);
+  const injector = inject(Injector);
 
-  const user = await firstValueFrom(authState(auth));
+  const user = await runInInjectionContext(injector, () =>
+    firstValueFrom(authState(auth))
+  );
 
   if (user) {
     if (!authService.currentUid) {
@@ -39,7 +42,10 @@ export const authGuard: CanActivateFn = async (): Promise<boolean | UrlTree> => 
 export const publicOnlyGuard: CanActivateFn = async (): Promise<boolean | UrlTree> => {
   const auth = inject(Auth);
   const router = inject(Router);
+  const injector = inject(Injector);
 
-  const user = await firstValueFrom(authState(auth));
+  const user = await runInInjectionContext(injector, () =>
+    firstValueFrom(authState(auth))
+  );
   return user ? router.parseUrl(`/home/${user.uid}`) : true;
 };
