@@ -135,6 +135,7 @@ export class AuthentificationService {
     return this.runInContext(async () => {
       const result = await signInAnonymously(this.auth);
       this.currentUid = result.user.uid;
+      await this.cleanupOrphanedGuests(this.currentUid!);
       const guestData: UserInterface = {
         uId: this.currentUid!,
         uName: 'Gast',
@@ -151,6 +152,25 @@ export class AuthentificationService {
       await updateDoc(channelRef, { cUserIds: arrayUnion(this.currentUid) });
       return result;
     });
+  }
+
+  /**
+   * Entfernt verwaiste Gast-Dokumente, die von früheren Gast-Sessions
+   * übrig geblieben sind (z.B. wenn der Tab ohne Logout geschlossen wurde).
+   * Der aktuelle Gast (currentUid) wird dabei ausgenommen.
+   */
+  private async cleanupOrphanedGuests(currentUid: string): Promise<void> {
+    try {
+      const usersCollection = collection(this.firestore, 'users');
+      const guestQuery = query(usersCollection, where('uEmail', '==', ''));
+      const snapshot = await getDocs(guestQuery);
+      const deletions = snapshot.docs
+        .filter((docSnap) => docSnap.id !== currentUid)
+        .map((docSnap) => deleteDoc(doc(usersCollection, docSnap.id)));
+      await Promise.all(deletions);
+    } catch (cleanupErr) {
+      console.warn('Bereinigung alter Gast-Dokumente fehlgeschlagen', cleanupErr);
+    }
   }
 
   async sendResetPasswordEmail(email: string): Promise<void> {

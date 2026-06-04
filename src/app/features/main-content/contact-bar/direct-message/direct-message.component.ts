@@ -53,13 +53,17 @@ export class DirectMessageComponent implements OnInit {
         map((users: any[]) => users.map(user => user as User))
       );
     });
-    this.activeUsers$ = users$.pipe(
+    // Fremde Gast-Konten (leere E-Mail) ausblenden – nur der eigene Gast bleibt sichtbar.
+    const visibleUsers$ = users$.pipe(
+      map(users => users.filter(user => user.uEmail !== '' || user.uId === this.activeUserId))
+    );
+    this.activeUsers$ = visibleUsers$.pipe(
       map(users => users.filter(user => user.uId === this.activeUserId))
     );
-    this.inactiveUsers$ = users$.pipe(
+    this.inactiveUsers$ = visibleUsers$.pipe(
       map(users => users.filter(user => user.uId !== this.activeUserId))
     );
-    users$.subscribe(users => {
+    visibleUsers$.subscribe(users => {
       this.activeUser = users.find(user => user.uId === this.activeUserId);
     });
   }
