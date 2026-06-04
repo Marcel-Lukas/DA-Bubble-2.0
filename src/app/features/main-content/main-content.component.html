@@ -52,6 +52,7 @@
           (openThread)="openThread($event)"
           (closeThread)="closeThread()"
           (openChat)="handleOpenChat($event)"
+          (channelDeleted)="handleChannelDeleted()"
         >
         </app-message-area>
 
@@ -81,6 +82,7 @@
       [activeUserId]="activeUserId"
       (openThread)="openThread($event)"
       (closeThread)="closeThread()"
+      (channelDeleted)="handleChannelDeleted()"
     >
     </app-message-area>
     @if (isThreadOpen) {

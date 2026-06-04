@@ -40,13 +40,16 @@ export class ChannelService {
     return allChannels;
   }
 
-  getChannelRealtime(channelId: string): Observable<Channel> {
-    return new Observable<Channel>((observer) => {
+  getChannelRealtime(channelId: string): Observable<Channel | null> {
+    return new Observable<Channel | null>((observer) => {
       const unsub = runInInjectionContext(this.injector, () => {
         const ref = doc(this.firestore, 'channels', channelId);
         return onSnapshot(ref, (snap) => {
           if (snap.exists()) {
             observer.next({ ...(snap.data() as Channel), cId: snap.id });
+          } else {
+            // Channel wurde gelöscht -> Subscriber benachrichtigen
+            observer.next(null);
           }
         });
       });

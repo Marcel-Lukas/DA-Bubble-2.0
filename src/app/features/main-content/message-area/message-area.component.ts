@@ -62,6 +62,8 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     chatType: 'private' | 'channel';
     chatId: string;
   }>();
+  /** Wird ausgelöst, wenn der aktuell geöffnete Channel gelöscht wurde. */
+  @Output() channelDeleted = new EventEmitter<void>();
 
   @ViewChild('scrollContainer') private scrollCont!: ElementRef<HTMLDivElement>;
   @ViewChild('composer')
@@ -195,11 +197,33 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
       .getChannelRealtime(this.chatId!)
       .subscribe({
         next: (ch) => {
+          if (!ch) {
+            // Channel wurde gelöscht -> Chat für alle schließen
+            this.handleDeletedChannel();
+            return;
+          }
           this.channelData = ch;
           this.loadChannelMembers();
         },
         error: (err) => console.error('Channel-Realtime', err),
       });
+  }
+
+  private handleDeletedChannel() {
+    this.channelSub?.unsubscribe();
+    this.channelMemberSubs.forEach((s) => s.unsubscribe());
+    this.channelMemberSubs = [];
+    this.messagesSub?.unsubscribe();
+
+    this.channelData = null;
+    this.channelMembers = [];
+    this.resetMessages();
+    this.isEditChannelOpen = false;
+    this.isChannelMemberOpen = false;
+    this.newChannelMembers = false;
+    this.addMemberPopUp = false;
+
+    this.channelDeleted.emit();
   }
 
   private loadChannelMembers() {
@@ -336,6 +360,14 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
   private async sendMessage() {
     const txt = this.newMessageText.trim();
     if (!txt) return;
+
+    // In Channels nur senden, wenn der Channel noch existiert (nicht gelöscht).
+    if (this.chatType === 'channel') {
+      if (!this.chatId || !this.channelData) {
+        this.newMessageText = '';
+        return;
+      }
+    }
 
     if (this.chatType === 'thread' && this.chatId) {
       await this.messageService.replyInThread(

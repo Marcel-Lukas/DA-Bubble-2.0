@@ -77,6 +77,15 @@ export class MainContentComponent {
     this.threadId = event.threadId;
   }
 
+  handleChannelDeleted() {
+    // Der aktuell geöffnete Channel wurde gelöscht -> Chat für alle schließen
+    // und auf den eigenen "leeren" Zustand zurücksetzen.
+    this.isThreadOpen = false;
+    this.threadId = '';
+    this.chatType = 'private';
+    this.chatId = this.activeUserId;
+  }
+
   openThread(threadId: string) {
     this.isThreadOpen = true;
     this.threadId = threadId;
