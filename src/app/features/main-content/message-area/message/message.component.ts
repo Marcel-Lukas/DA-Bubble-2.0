@@ -15,7 +15,9 @@ import {
 import { Message } from '../../../../shared/interfaces/message.interface';
 import { Timestamp } from '@angular/fire/firestore';
 import { UserService } from '../../../../shared/services/user.service';
+import { ChannelService } from '../../../../shared/services/channel.service';
 import { User } from '../../../../shared/interfaces/user.interface';
+import { Channel } from '../../../../shared/interfaces/channel.interface';
 import {
   GroupedReaction,
   Reaction,
@@ -31,6 +33,18 @@ import { FormsModule } from '@angular/forms';
 // its own lazy chunk that is only fetched the first time the user opens the
 // emoji picker.
 
+/**
+ * Ein Teilstück eines Nachrichtentextes für das Rendern. Reiner Text oder
+ * eine Erwähnung eines Users (`@`) bzw. eines Channels (`#`).
+ */
+export interface MessageSegment {
+  type: 'text' | 'user' | 'channel';
+  /** Anzuzeigender Text (z.B. `@Max`, `#general` oder reiner Text). */
+  label: string;
+  /** Id des referenzierten Users/Channels, falls auflösbar. */
+  refId?: string;
+}
+
 @Component({
   selector: 'app-message',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +54,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class MessageComponent implements OnInit {
   private userService = inject(UserService);
+  private channelService = inject(ChannelService);
   private messageService = inject(MessageService);
   // With OnPush change detection, asynchronously assigned fields (sender,
   // active user, thread info) don't trigger a re-render automatically. We
@@ -55,6 +70,8 @@ export class MessageComponent implements OnInit {
 
   @Output() profileClick = new EventEmitter<string>();
   @Output() threadOpen = new EventEmitter<string>();
+  /** Klick auf eine Channel-Erwähnung (`#channel`) im Nachrichtentext. */
+  @Output() channelMentionClick = new EventEmitter<string>();
 
   @ViewChild('emojiPicker', { read: ElementRef }) emojiPickerRef?: ElementRef;
   @ViewChild('emojiBtn', { read: ElementRef }) emojiBtnRef?: ElementRef;
@@ -66,6 +83,8 @@ export class MessageComponent implements OnInit {
   activeUserData: User | null = null;
   senderData: User | null = null;
   groupedReactions: GroupedReaction[] = [];
+  /** Aufbereiteter Nachrichtentext mit hervorgehobenen Erwähnungen. */
+  messageSegments: MessageSegment[] = [];
   shownReactionNumber = 7;
   editText = '';
   replyCount = 0;
@@ -81,12 +100,14 @@ export class MessageComponent implements OnInit {
     this.loadActiveUserData();
     this.regroupReactions();
     this.loadThreadInfo();
+    this.loadMentionData();
   }
 
   ngOnChanges(ch: SimpleChanges): void {
     if (ch['message']) {
       this.regroupReactions();
       this.loadThreadInfo();
+      this.parseMessageText();
     }
   }
 
@@ -148,6 +169,102 @@ export class MessageComponent implements OnInit {
             this.activeUserId
           )
         : [];
+  }
+
+  // ---- Mention-Aufbereitung ------------------------------------------------
+
+  /** Bekannte User-/Channel-Namen für die Auflösung von Erwähnungen. */
+  private knownUsers: User[] = [];
+  private knownChannels: Channel[] = [];
+
+  /**
+   * Lädt einmalig alle User und Channels, um Erwähnungen im Nachrichtentext
+   * auf konkrete Ids auflösen zu können, und parst danach den Text.
+   */
+  private loadMentionData(): void {
+    Promise.all([
+      this.userService.getAllUsers(),
+      this.channelService.getAllChannels(),
+    ])
+      .then(([users, channels]) => {
+        this.knownUsers = users;
+        this.knownChannels = channels;
+        this.parseMessageText();
+        this.cdr.markForCheck();
+      })
+      .catch((err) => console.error('Mention-Daten', err));
+  }
+
+  /**
+   * Zerlegt `message.mText` in Text- und Erwähnungs-Segmente. Erwähnungen
+   * werden nur dann als solche markiert, wenn der referenzierte User/Channel
+   * existiert – andernfalls bleibt der Text unverändert stehen.
+   */
+  private parseMessageText(): void {
+    const text = this.message?.mText ?? '';
+    const segments: MessageSegment[] = [];
+    const regex = /([@#])([\p{L}\p{N}_.-]+)/gu;
+
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      this.pushPlainText(segments, text.slice(lastIndex, match.index));
+      this.pushMention(segments, match[1], match[2]);
+      lastIndex = match.index + match[0].length;
+    }
+
+    this.pushPlainText(segments, text.slice(lastIndex));
+    this.messageSegments = segments;
+  }
+
+  private pushPlainText(segments: MessageSegment[], value: string): void {
+    if (value) segments.push({ type: 'text', label: value });
+  }
+
+  /**
+   * Hängt eine Erwähnung an, wenn der Name aufgelöst werden kann; sonst wird
+   * das Roh-Token als reiner Text behandelt.
+   */
+  private pushMention(
+    segments: MessageSegment[],
+    symbol: string,
+    name: string
+  ): void {
+    const resolved =
+      symbol === '@'
+        ? this.findUserByName(name)
+        : this.findChannelByName(name);
+
+    if (resolved) {
+      segments.push({
+        type: symbol === '@' ? 'user' : 'channel',
+        label: symbol + name,
+        refId: resolved,
+      });
+    } else {
+      this.pushPlainText(segments, symbol + name);
+    }
+  }
+
+  private findUserByName(name: string): string | undefined {
+    const lower = name.toLowerCase();
+    return this.knownUsers.find((u) => u.uName?.toLowerCase() === lower)?.uId;
+  }
+
+  private findChannelByName(name: string): string | undefined {
+    const lower = name.toLowerCase();
+    return this.knownChannels.find(
+      (c) => c.cName?.toLowerCase() === lower
+    )?.cId ?? undefined;
+  }
+
+  /** Klick auf eine Erwähnung im gerenderten Text. */
+  onMentionClick(segment: MessageSegment): void {
+    if (!segment.refId) return;
+    if (segment.type === 'user') this.profileClick.emit(segment.refId);
+    if (segment.type === 'channel')
+      this.channelMentionClick.emit(segment.refId);
   }
 
   private groupReactionsWithNames(
@@ -335,6 +452,7 @@ export class MessageComponent implements OnInit {
       .editMessageText(this.message.mId, trimmed)
       .then(() => {
         this.message.mText = trimmed;
+        this.parseMessageText();
         this.closeEdit();
       })
       .catch(console.error);

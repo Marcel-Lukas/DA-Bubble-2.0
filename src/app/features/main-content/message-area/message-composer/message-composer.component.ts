@@ -143,12 +143,12 @@ export class MessageComposerComponent {
     const ta = this.messageInputRef?.nativeElement;
     if (!ta || this.currentMentionPos === -1) return;
 
-    const caretPos = ta.selectionStart;
+    const restStart = this.findMentionEnd(this.currentMentionPos);
     const newText =
       this.newMessageText.slice(0, this.currentMentionPos + 1) +
       text +
       ' ' +
-      this.newMessageText.slice(caretPos);
+      this.newMessageText.slice(restStart);
 
     this.newMessageText = newText;
     ta.value = newText;
@@ -157,6 +157,15 @@ export class MessageComposerComponent {
     ta.setSelectionRange(newCaret, newCaret);
     ta.focus();
     this.hideSuggestions();
+  }
+
+  /**
+   * Ermittelt das Ende des aktuell getippten Mention-Tokens
+   * (vom `@`/`#` bis zum nächsten Leerzeichen oder Textende).
+   */
+  private findMentionEnd(mentionPos: number): number {
+    const nextSpace = this.newMessageText.indexOf(' ', mentionPos + 1);
+    return nextSpace === -1 ? this.newMessageText.length : nextSpace;
   }
 
   private hideSuggestions() {

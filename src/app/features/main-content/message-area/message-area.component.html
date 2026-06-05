@@ -99,6 +99,7 @@
       [activeUserId]="activeUserId"
       [chatType]="chatType"
       (profileClick)="openUserProfil($event)"
+      (channelMentionClick)="openChannelMention($event)"
     ></app-message>
 
     <div class="thread-separator">
@@ -123,6 +124,7 @@
       [chatType]="chatType"
       (profileClick)="openUserProfil($event)"
       (threadOpen)="handleThreadClick($event)"
+      (channelMentionClick)="openChannelMention($event)"
     ></app-message>
     } } @else { @if (messages && messages.length === 0) { @if(chatType ===
     'private'){
@@ -164,6 +166,7 @@
       [chatType]="chatType"
       (profileClick)="openUserProfil($event)"
       (threadOpen)="handleThreadClick($event)"
+      (channelMentionClick)="openChannelMention($event)"
     ></app-message>
     } } }
   </div>

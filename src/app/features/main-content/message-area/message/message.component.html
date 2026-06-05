@@ -37,7 +37,14 @@
       <h5>{{ getTimeInHours(message.mTime) }} Uhr</h5>
     </div>
 
-    <div class="message-text">{{ message.mText }}</div>
+    <div class="message-text">@for (segment of messageSegments; track $index)
+      {@if (segment.type === 'text') {<span>{{ segment.label }}</span>} @else
+      {<span
+        class="mention"
+        [class.mention-channel]="segment.type === 'channel'"
+        (click)="onMentionClick(segment)"
+        >{{ segment.label }}</span
+      >}}</div>
 
     <div class="message-attachments">
       @if (groupedReactions && groupedReactions.length > 0) {

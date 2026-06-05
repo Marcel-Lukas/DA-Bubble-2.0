@@ -109,6 +109,20 @@ section {
     word-break: break-word;
     white-space: pre-wrap;
     font-size: 18px;
+
+    .mention {
+      cursor: pointer;
+      color: #535af1;
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 0 2px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+
+      &:hover {
+        color: #444df2;
+        background-color: rgba(83, 90, 241, 0.12);
+      }
+    }
   }
 
   .message-attachments {
@@ -128,6 +142,16 @@ section {
     color: #ffffff;
     background-color: #797ef3;
     border-radius: 30px 0px 30px 30px;
+
+    .mention {
+      color: #ffffff;
+      text-decoration: underline;
+
+      &:hover {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.22);
+      }
+    }
   }
 
   .message-attachments {

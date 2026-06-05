@@ -320,6 +320,11 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     this.isProfilOpen = true;
   }
 
+  /** \u00d6ffnet den per `#channel`-Erw\u00e4hnung angeklickten Channel. */
+  openChannelMention(channelId: string) {
+    this.openChat.emit({ chatType: 'channel', chatId: channelId });
+  }
+
   toggleChannelMembers() {
     this.isChannelMemberOpen = !this.isChannelMemberOpen;
   }
