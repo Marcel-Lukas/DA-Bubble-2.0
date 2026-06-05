@@ -52,6 +52,7 @@ export class ChannelLeaveComponent implements OnInit{
   animateOut = false;
   nameExists = false;
   createdByUserName: string = 'Unbekannt';
+  confirmLeave: boolean = false;
 
   constructor(private userService: UserService, private channelService: ChannelService) {}
 
@@ -121,6 +122,23 @@ export class ChannelLeaveComponent implements OnInit{
       }
       this.isVisible = true;
     }, 200);
+  }
+
+
+  openConfirmLeave() {
+    this.confirmLeave = true;
+  }
+
+
+  cancelLeave() {
+    this.confirmLeave = false;
+  }
+
+
+  async confirmRemoveMember() {
+    this.confirmLeave = false;
+    await this.removeMember();
+    this.closeWindow();
   }
 
 

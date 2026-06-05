@@ -109,7 +109,7 @@
                 </app-device-visible>
             </div>
             <div class="channelLeaveButton">
-                <button (click)="closeWindow(); removeMember()">Channel verlassen</button>
+                <button (click)="openConfirmLeave()">Channel verlassen</button>
             </div>
         </div>
     </section>
@@ -147,3 +147,15 @@
       ></app-add-new-members>
     </div>
   }
+@if (confirmLeave) {
+    <div (click)="cancelLeave()" class="confirmLeaveOverlay">
+        <div (click)="$event.stopPropagation()" class="confirmLeaveModal">
+            <h2>Channel wirklich verlassen?</h2>
+            <p>Möchtest du den Channel <span>{{ channelData?.cName }}</span> wirklich verlassen?</p>
+            <div class="confirmLeaveButtons">
+                <button class="cancelBtn" (click)="cancelLeave()">Abbrechen</button>
+                <button class="confirmBtn" (click)="confirmRemoveMember()">Channel verlassen</button>
+            </div>
+        </div>
+    </div>
+}

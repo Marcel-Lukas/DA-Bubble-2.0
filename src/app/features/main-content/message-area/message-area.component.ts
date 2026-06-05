@@ -227,6 +227,15 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
             this.handleDeletedChannel();
             return;
           }
+          if (
+            this.activeUserId &&
+            !ch.cUserIds?.includes(this.activeUserId)
+          ) {
+            // Aktueller Nutzer ist kein Mitglied mehr (z.B. Channel verlassen
+            // oder von einem Admin entfernt) -> Chat schließen.
+            this.handleDeletedChannel();
+            return;
+          }
           this.channelData = ch;
           this.loadChannelMembers();
         },
