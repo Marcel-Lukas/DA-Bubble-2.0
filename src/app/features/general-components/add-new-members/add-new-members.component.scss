@@ -56,8 +56,9 @@
   border: none;
   background-color: #686868;
   position: absolute;
-  bottom: 24px;
+  bottom: 8px;
   z-index: 100;
+  cursor: not-allowed;
   &:hover {
     opacity: 0.8;
   }
@@ -163,19 +164,20 @@
 .showMembers {
   @include flexBox(column, '', '', 15);
   background-color: white;
-  top: 50px;
-  height: 200px;
+  top: 124px;
+  left: 10px;
+  max-height: 400px;
   width: 90%;
   padding: 20px 40px;
   box-shadow: 4px 4px 7px 4px rgba(0, 0, 0, 0.2);
-  border-radius: 0 30px 30px 30px;
+  border-radius: 0 0 30px 30px;
   position: absolute;
   z-index: 120;
   overflow: auto;
 }
 
 .showMembers::-webkit-scrollbar-track {
-  margin-top: 20px;
+  margin-top: 4px;
   margin-bottom: 20px;
 }
 
@@ -252,7 +254,7 @@
   }
 
   .showMembers {
-    height: 100px;
+    max-height: 200px;
   }
 }
 
@@ -265,7 +267,6 @@
     padding: 20px 16px;
     width: 100%;
     margin-left: -20px;
-    border-radius: 30px;
   }
  
 }

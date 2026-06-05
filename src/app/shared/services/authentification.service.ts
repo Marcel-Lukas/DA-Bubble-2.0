@@ -84,7 +84,7 @@ export class AuthentificationService {
         uEmail:         email,
         uUserImage:     'assets/img/' + profilePictureUrl,
         uStatus:        false,
-        uLastReactions: ['👍', '😊'],
+        uLastReactions: ['👍', '🙏🏻', '🔥'],
       };
 
       const userRef    = collection(this.firestore, 'users');
@@ -120,7 +120,7 @@ export class AuthentificationService {
         uEmail: result.user.email || '',
         uUserImage: result.user.photoURL || 'assets/img/profile.png',
         uStatus: true,
-        uLastReactions: ['👍', '😊']
+        uLastReactions: ['👍', '🙏🏻', '🔥'],
       };
       const userRef = collection(this.firestore, 'users');
       const userDocRef = doc(userRef, result.user.uid);
@@ -141,7 +141,7 @@ export class AuthentificationService {
         uEmail: '',
         uUserImage: 'assets/img/profile.png',
         uStatus: true,
-        uLastReactions: ['👍', '😊']
+        uLastReactions: ['👍', '🙏🏻', '🔥'],
       };
       const userRef = collection(this.firestore, 'users');
       const userDocRef = doc(userRef, this.currentUid!);
