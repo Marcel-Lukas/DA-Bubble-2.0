@@ -234,10 +234,11 @@ section {
 }
 
 emoji-mart {
-  position: absolute;
-  bottom: 0px;
-  right: 266px;
-  z-index: 95;
+  position: fixed;
+  bottom: 214px;
+  left: 170px;
+  z-index: 99;
+  padding-left: 130px;
 }
 
 .active-user-emoji {
