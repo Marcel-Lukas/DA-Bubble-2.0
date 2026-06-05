@@ -325,18 +325,25 @@ export class MessageComponent implements OnInit {
   saveEdit() {
     if (!this.message.mId) return;
     const trimmed = this.editText.trim();
+    if (!trimmed) return;
+
     if (trimmed === (this.message.mText ?? '').trim()) {
-      this.toggleEdit();
+      this.closeEdit();
       return;
     }
     this.messageService
       .editMessageText(this.message.mId, trimmed)
       .then(() => {
         this.message.mText = trimmed;
-        this.toggleEdit();
-        this.isOptionsOpen = false;
+        this.closeEdit();
       })
       .catch(console.error);
+  }
+
+  private closeEdit() {
+    this.isEditOpen = false;
+    this.isOptionsOpen = false;
+    this.cdr.markForCheck();
   }
 
   @HostListener('document:click', ['$event'])
