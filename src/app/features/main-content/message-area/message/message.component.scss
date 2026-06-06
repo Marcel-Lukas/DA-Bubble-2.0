@@ -213,13 +213,13 @@ section {
 }
 
 .message-actions {
-  position: absolute;
-  right: 46px;
-  top: -18px;
-  padding: 4px 16px 4px 20px;
+  position: relative;
+  height: 40px;
+  padding: 20px;
   background-color: #ffffff;
   border: 1px solid #adb0d9;
-  border-radius: 25px 25px 0 25px;
+  border-radius: 24px;
+  z-index: 99;
   @include flexBox(row, initial, center, 5);
 
   opacity: 0;
@@ -236,7 +236,7 @@ section {
 
   &.user-message-actions {
     right: initial;
-    left: 46px;
+    left: 0;
     transform: translateX(50px);
 
     section:hover &,
@@ -257,25 +257,17 @@ section {
   }
 }
 
-.active-user-emoji {
+emoji-mart {
   position: absolute;
-  left: 50px;
-  top: 32px;
+  left: 0;
+  top: 48px;
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 357px;
   z-index: 99;
 }
 
-emoji-mart {
-  display: flex;
-  border-radius: 26px 0px 10px 12px;
-  overflow: hidden;
-  max-width: 299px;
-  max-height: 357px;
-}
-
-.user-message-actions {
-  right: initial;
-  left: 46px;
-}
 
 .thread-emoji {
   right: initial;
@@ -328,14 +320,12 @@ emoji-mart {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 510px) {
   .message-actions {
     position: absolute;
     right: unset !important;
     left: 8px !important;
+    top: 90px;
     max-width: 299px;
-  }
-  .active-user-emoji {
-    left: 8px;
   }
 }

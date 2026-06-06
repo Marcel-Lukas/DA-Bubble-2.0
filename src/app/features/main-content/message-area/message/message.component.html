@@ -1,37 +1,24 @@
-<section
-  [class.row-reverse]="message.mSenderId === activeUserId"
-  [class.edit-open]="isEditOpen"
-  [class.thread]="chatType === 'thread'"
->
+<section [class.row-reverse]="message.mSenderId === activeUserId" [class.edit-open]="isEditOpen"
+  [class.thread]="chatType === 'thread'">
   <img src="{{ senderData?.uUserImage }}" alt="" />
 
   @if (isEditOpen && message.mSenderId === activeUserId) {
   <div class="edit-message">
     <textarea #editTextarea type="text" [(ngModel)]="editText"></textarea>
     <div>
-      <button
-        class="icon-button blue-hover"
-        (click)="toggleEmojiPicker($event)"
-      >
+      <button class="icon-button blue-hover" (click)="toggleEmojiPicker($event)">
         <div class="material-symbols textfield-icon">sentiment_satisfied</div>
       </button>
       <div>
         <button class="secondary-btn" (click)="toggleEdit()">Abbrechen</button>
-        <button
-          class="primary-btn"
-          (click)="saveEdit()"
-          [disabled]="!editText.trim()"
-        >
+        <button class="primary-btn" (click)="saveEdit()" [disabled]="!editText.trim()">
           Speichern
         </button>
       </div>
     </div>
   </div>
   } @else {
-  <div
-    class="message"
-    [class.user-message]="message.mSenderId === activeUserId"
-  >
+  <div class="message" [class.user-message]="message.mSenderId === activeUserId">
     <div class="message-header">
       <h3 (click)="openProfil()">{{ senderData?.uName }}</h3>
       <h5>{{ getTimeInHours(message.mTime) }} Uhr</h5>
@@ -39,12 +26,8 @@
 
     <div class="message-text">@for (segment of messageSegments; track $index)
       {@if (segment.type === 'text') {<span>{{ segment.label }}</span>} @else
-      {<span
-        class="mention"
-        [class.mention-channel]="segment.type === 'channel'"
-        (click)="onMentionClick(segment)"
-        >{{ segment.label }}</span
-      >}}</div>
+      {<span class="mention" [class.mention-channel]="segment.type === 'channel'" (click)="onMentionClick(segment)">{{
+        segment.label }}</span>}}</div>
 
     <div class="message-attachments">
       @if (groupedReactions && groupedReactions.length > 0) {
@@ -59,9 +42,7 @@
             <p>{{ reaction.actionLine }}</p>
           </div>
 
-          <span (click)="addReaction(reaction.reaction)"
-            >{{ reaction.reaction }} {{ reaction.count }}</span
-          >
+          <span (click)="addReaction(reaction.reaction)">{{ reaction.reaction }} {{ reaction.count }}</span>
         </div>
         } @if (groupedReactions.length > shownReactionNumber) {
         <div (click)="setShownReactionNumber()">
@@ -71,9 +52,7 @@
         shownReactionNumber > 7) {
         <div (click)="setShownReactionNumber()">Weniger anzeigen</div>
         }
-        <span class="material-symbols" (click)="toggleEmojiPicker($event)"
-          >add_reaction</span
-        >
+        <span class="material-symbols" (click)="toggleEmojiPicker($event)">add_reaction</span>
       </div>
       }@if (message.mThreadId && chatType !== 'thread' && replyCount > 0) {
       <div class="thread-field" (click)="onThreadClick()">
@@ -87,68 +66,49 @@
     </div>
   </div>
 
-  <div
-    class="message-actions"
-    [class.always]="isOptionsOpen"
-    [class.user-message-actions]="message.mSenderId === activeUserId"
-  >
+  
+  <div class="message-actions" 
+      [class.always]="isOptionsOpen"
+      [class.user-message-actions]="message.mSenderId === activeUserId">
     @if ( chatType != 'thread' ) { @for (reaction of
     activeUserData?.uLastReactions; track reaction) {
     <span (click)="addReaction(reaction)">{{ reaction }}</span>
     } }
 
-    <span
-      #emojiBtn
-      class="material-symbols action-btn"
-      (click)="toggleEmojiPicker($event)"
-    >
+    <span #emojiBtn class="material-symbols action-btn" (click)="toggleEmojiPicker($event)">
       add_reaction
     </span>
 
-    <div
-      class="material-symbols action-btn"
-      [class.d-none]="chatType === 'thread'"
-      (click)="onThreadClick()"
-    >
+    <div class="material-symbols action-btn" [class.d-none]="chatType === 'thread'" (click)="onThreadClick()">
       comment
     </div>
 
-    <div
-      #optionsBtn
-      class="material-symbols action-btn"
-      [class.d-none]="message.mSenderId != activeUserId"
-      (click)="toggleOptions($event)"
-    >
+    <div #optionsBtn class="material-symbols action-btn" [class.d-none]="message.mSenderId != activeUserId"
+      (click)="toggleOptions($event)">
       more_vert
     </div>
 
     @if (isOptionsOpen) {
-    <div
-      #optionsMenu
-      class="options-menu"
-      [class.active-user-options]="message.mSenderId === activeUserId"
-    >
+    <div #optionsMenu class="options-menu" [class.active-user-options]="message.mSenderId === activeUserId">
       <div (click)="openEdit()">Nachricht bearbeiten</div>
       <div (click)="togglePermanentDelete()">Nachricht löschen</div>
     </div>
     }
-  </div>
-  }
+
   @defer (when isEmojiPickerOpen) {
     @if (isEmojiPickerOpen) {
-      <emoji-mart
-        #emojiPicker
-        (emojiClick)="onEmojiPicked($event)"
-        [class.active-user-emoji]="message.mSenderId === activeUserId"
-        [class.thread-emoji]="chatType === 'thread'"
-      ></emoji-mart>
+    <emoji-mart #emojiPicker (emojiClick)="onEmojiPicked($event)"
+      [class.active-user-emoji]="message.mSenderId === activeUserId"
+      [class.thread-emoji]="chatType === 'thread'"></emoji-mart>
     }
   }
+
+  </div>
+  }
+
 </section>
+
 @if (isPermanentDeleteOpen) {
-<app-permanent-delete
-  [target]="'message'"
-  [id]="message.mId"
-  (close)="isPermanentDeleteOpen = false"
-></app-permanent-delete>
+<app-permanent-delete [target]="'message'" [id]="message.mId"
+  (close)="isPermanentDeleteOpen = false"></app-permanent-delete>
 }
