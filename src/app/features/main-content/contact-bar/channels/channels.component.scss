@@ -115,14 +115,23 @@ section {
   cursor: pointer;
   background-color: white;
   border: none;
+  position: relative;
   span {
     @include fontStyle(18px, black, 400);
     text-align: left;
     max-height: 28px;
     width: 170px;
     overflow: hidden;
-    border-radius: 0 50% 50% 0;
+    border-radius: 0 12px 12px 0;
     margin-right: 10px;
+  }
+  .unreadDotChannel {
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    right: 32px;
+    top: 12px;
   }
   &:hover {
     background-color: #eceefe;

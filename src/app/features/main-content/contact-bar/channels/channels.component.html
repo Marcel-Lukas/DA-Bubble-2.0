@@ -32,7 +32,7 @@
           </div>
           <span>{{ channel.name }}</span>
           @if (unreadChannels.has(channel.id)) {
-          <span class="unreadDot" aria-label="Neue Nachricht"></span>
+          <span class="unreadDot unreadDotChannel" aria-label="Neue Nachricht"></span>
           }
         </div>
         @if (channel.name != 'Willkommen' && channel.createdBy === activeUserId) {
