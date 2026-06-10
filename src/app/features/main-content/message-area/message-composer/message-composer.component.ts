@@ -23,11 +23,12 @@ import { ChannelService } from '../../../../shared/services/channel.service';
 import { User } from '../../../../shared/interfaces/user.interface';
 import { Channel } from '../../../../shared/interfaces/channel.interface';
 import { OnlinePipe } from '../../../../shared/pipes/online.pipe';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 
 @Component({
   selector: 'app-message-composer',
   standalone: true,
-  imports: [CommonModule, FormsModule, PickerComponent, OnlinePipe],
+  imports: [CommonModule, FormsModule, PickerComponent, OnlinePipe, ImageFallbackDirective],
   templateUrl: './message-composer.component.html',
   styleUrls: ['./message-composer.component.scss'],
 })

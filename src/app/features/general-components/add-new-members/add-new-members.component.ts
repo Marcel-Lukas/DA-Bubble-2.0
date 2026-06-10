@@ -5,11 +5,12 @@ import { ChannelService } from '../../../shared/services/channel.service';
 import { UserService } from '../../../shared/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { OnlinePipe } from '../../../shared/pipes/online.pipe';
+import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 
 @Component({
   selector: 'app-add-new-members',
   standalone: true,
-  imports: [CommonModule, FormsModule, OnlinePipe],
+  imports: [CommonModule, FormsModule, OnlinePipe, ImageFallbackDirective],
   templateUrl: './add-new-members.component.html',
   styleUrls: ['./add-new-members.component.scss'], 
   encapsulation: ViewEncapsulation.None,

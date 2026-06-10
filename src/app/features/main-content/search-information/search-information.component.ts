@@ -14,6 +14,7 @@ import { MessageService } from '../../../shared/services/message.service';
 import { UserService } from '../../../shared/services/user.service';
 import { Message } from '../../../shared/interfaces/message.interface';
 import { Channel } from '../../../shared/interfaces/channel.interface';
+import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 
 interface ChannelMessage {
   mText: string;
@@ -37,7 +38,7 @@ interface ThreadHit {
 @Component({
   selector: 'app-search-information',
   standalone: true,
-  imports: [],
+  imports: [ImageFallbackDirective],
   templateUrl: './search-information.component.html',
   styleUrl: './search-information.component.scss',
 })

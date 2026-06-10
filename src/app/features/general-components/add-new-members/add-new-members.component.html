@@ -44,7 +44,7 @@
           @for (member of selectedMembers | slice:0:displayCount; track trackById($index, member)) {
           <div class="containerDelete">
             <div class="inputNameImgPush">
-              <img src="{{ member.uUserImage }}" alt="{{ member.uName }}" />
+              <img src="{{ member.uUserImage }}" appImageFallback alt="{{ member.uName }}" />
               <span>{{ member.uName }}</span>
             </div>
             <button class="inputNamePushClose" (click)="toggleMember(member)">
@@ -70,7 +70,7 @@
             @for(member of filteredMembers; track trackById($index, member)) {
             <button (mousedown)="toggleMember(member)" [class.selected]="selectedMemberIds.includes(member.uId!)" class="memberItem">
               <div class="user-img-status">
-                <img src="{{ member.uUserImage }}" alt="" />
+                <img src="{{ member.uUserImage }}" appImageFallback alt="" />
                 <span [ngClass]="(member | online) ? 'online' : 'offline'"></span>
               </div>
               <h3>{{ member.uName }}</h3>

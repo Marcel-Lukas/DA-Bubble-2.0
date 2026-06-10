@@ -6,11 +6,12 @@ import { Observable, Subscription } from 'rxjs';
 import { User } from '../../../../shared/interfaces/user.interface';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { ActivatedRoute } from '@angular/router';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 
 @Component({
   selector: 'app-direct-message',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ImageFallbackDirective],
   templateUrl: './direct-message.component.html',
   styleUrl: './direct-message.component.scss',
 })

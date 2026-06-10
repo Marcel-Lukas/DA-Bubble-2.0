@@ -1,6 +1,6 @@
 <section [class.row-reverse]="message.mSenderId === activeUserId" [class.edit-open]="isEditOpen"
   [class.thread]="chatType === 'thread'">
-  <img src="{{ senderData?.uUserImage }}" alt="" />
+  <img src="{{ senderData?.uUserImage }}" appImageFallback alt="" />
 
   @if (isEditOpen && message.mSenderId === activeUserId) {
   <div class="edit-message">

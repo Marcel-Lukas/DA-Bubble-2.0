@@ -9,7 +9,7 @@
   @for(user of foundUsers; track user) {
   <div (click)="insertUserSuggestion(user)">
     <div class="user-img-status">
-      <img src="{{ user?.uUserImage }}" alt="" />
+      <img src="{{ user?.uUserImage }}" appImageFallback alt="" />
       <span [ngClass]="(user | online) ? 'online' : 'offline'"></span>
     </div>
     <span>{{ user?.uName }}</span>

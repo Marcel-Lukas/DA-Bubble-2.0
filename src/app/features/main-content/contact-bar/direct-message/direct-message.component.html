@@ -20,7 +20,7 @@
     @for (user of activeUsers$ | async; track $index) {
       <button (click)="selectPrivateChat(user.uId); someAction()" class="directUser">
         <div class="user-img-status">
-          <img [src]="user.uUserImage" alt="" />
+          <img [src]="user.uUserImage" appImageFallback alt="" />
           <span [ngClass]="isOnline(user) ? 'online' : 'offline'"></span>
         </div>
         <span>{{ user.uName }} (Du)</span>
@@ -32,7 +32,7 @@
           [class.hasUnread]="unreadChats.has(user.uId)"
         >
           <div class="user-img-status">
-            <img [src]="user.uUserImage" alt="" />
+            <img [src]="user.uUserImage" appImageFallback alt="" />
             <span [ngClass]="isOnline(user) ? 'online' : 'offline'"></span>
           </div>
           <span>{{ user.uName }}</span>

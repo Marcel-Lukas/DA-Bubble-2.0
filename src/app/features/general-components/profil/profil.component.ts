@@ -13,11 +13,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../../shared/services/user.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 
 @Component({
   selector: 'app-profil',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageFallbackDirective],
   templateUrl: './profil.component.html',
   styleUrl: './profil.component.scss',
 })

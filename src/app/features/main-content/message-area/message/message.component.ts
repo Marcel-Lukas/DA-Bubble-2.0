@@ -27,6 +27,7 @@ import { MessageService } from '../../../../shared/services/message.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { PermanentDeleteComponent } from '../../../general-components/permanent-delete/permanent-delete.component';
 import { FormsModule } from '@angular/forms';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 
 // NOTE: `<emoji-mart>` is only referenced inside a `@defer` block in the
 // template. Angular therefore emits `@ctrl/ngx-emoji-mart` (and its CSS) as
@@ -48,7 +49,7 @@ export interface MessageSegment {
 @Component({
   selector: 'app-message',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PickerComponent, PermanentDeleteComponent, FormsModule],
+  imports: [PickerComponent, PermanentDeleteComponent, FormsModule, ImageFallbackDirective],
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
 })

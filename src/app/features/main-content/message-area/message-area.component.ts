@@ -26,6 +26,7 @@ import { ChannelMembersComponent } from './channel-members/channel-members.compo
 import { AddNewMembersComponent } from '../../general-components/add-new-members/add-new-members.component';
 import { MessageComposerComponent } from './message-composer/message-composer.component';
 import { OnlinePipe } from '../../../shared/pipes/online.pipe';
+import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 
 @Component({
   selector: 'app-message-area',
@@ -40,6 +41,7 @@ import { OnlinePipe } from '../../../shared/pipes/online.pipe';
     AddNewMembersComponent,
     MessageComposerComponent,
     OnlinePipe,
+    ImageFallbackDirective,
   ],
   templateUrl: './message-area.component.html',
   styleUrls: ['./message-area.component.scss'],
@@ -468,14 +470,6 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
         return 'Antworten...';
       default:
         return 'Starte eine neue Nachricht';
-    }
-  }
-
-  onAvatarError(ev: Event): void {
-    const img = ev.target as HTMLImageElement;
-    if (!img.dataset['fallback']) {
-      img.dataset['fallback'] = 'true';
-      img.src = 'assets/img/profile.png';
     }
   }
 

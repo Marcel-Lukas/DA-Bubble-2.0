@@ -25,7 +25,7 @@
       } @for (u of foundUsersNew; track u.uId) {
       <div (click)="selectUserNew(u)">
         <div class="user-img-status">
-          <img src="{{ u.uUserImage }}" alt="" />
+          <img src="{{ u.uUserImage }}" appImageFallback alt="" />
           <span [ngClass]="(u | online) ? 'online' : 'offline'"></span>
         </div>
         <span>{{ u.uName }}</span>
@@ -42,7 +42,7 @@
         <img
           [src]="chatPartner?.uUserImage || 'assets/img/profile.png'"
           loading="lazy"
-          (error)="onAvatarError($event)"
+          appImageFallback
           alt=""
         />
         <span [ngClass]="(chatPartner | online) ? 'online' : 'offline'"></span>
@@ -59,7 +59,7 @@
       <div class="channel-members">
         <div class="channel-every-member" (click)="toggleChannelMembers()">
           @for (member of channelMembers.slice(0,3); track member) {
-          <img src="{{ member.uUserImage }}" alt="" />
+          <img src="{{ member.uUserImage }}" appImageFallback alt="" />
           } @if (channelMembers.length > 3) {
           <div>...</div>
           }
@@ -130,7 +130,7 @@
     'private'){
     <div class="empty-private-chat">
       <div>
-        <img src="{{ chatPartner?.uUserImage }}" alt="" />
+        <img src="{{ chatPartner?.uUserImage }}" appImageFallback alt="" />
         <h1>{{ chatPartner?.uName }}</h1>
       </div>
       <p>
