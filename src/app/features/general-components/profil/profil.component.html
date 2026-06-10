@@ -19,6 +19,10 @@
                 <button class="buttonImg" (click)="bigUserImg()">
                     <img [src]="userImage" appImageFallback>
                 </button>
+                <button type="button" class="randomAvatarButton" (click)="setRandomAvatar()">
+                    <div class="material-symbols">refresh</div>
+                    <span>Zufälliges Bild</span>
+                </button>
                 @if (showAvatarChoice) {
                     <div class="avatarChoice">
                         @for (item of items; track $index) {
@@ -34,7 +38,7 @@
             <div class="nameActive">
                 <div class="nameEdit">
                     <span>{{ userName }}</span>
-                    @if (!showButton && userEmail !== '' ) {
+                    @if (!showButton) {
                         <a (click)="onEditClick()">Bearbeiten</a>
                         <button (click)="onEditClick()" class="editIconShow">
                             <div class="material-symbols editIcon">Edit</div>
@@ -56,7 +60,7 @@
             </div>
         }
         @else {
-            @if (showEditProfil) {
+            @if (showEditProfil && userEmail !== '') {
                 <div class="editInput">
                     <div class="editAccountText">
                         <img src="assets/icons/account_circle.svg">

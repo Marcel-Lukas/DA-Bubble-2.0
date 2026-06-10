@@ -85,6 +85,24 @@ img{
     0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
+.randomAvatarButton{
+    @include flexBox('', center, center, 8);
+    padding: 8px 16px;
+    border: 1px solid #ADB0D9;
+    border-radius: 25px;
+    background-color: white;
+    color: #444DF2;
+    cursor: pointer;
+    font-size: 16px;
+    .material-symbols{
+        font-size: 20px;
+    }
+    &:hover{
+        background-color: #444DF2;
+        color: white;
+    }
+}
+
 header{
     @include flexBox("", space-between, center, "");
     height: 40px;

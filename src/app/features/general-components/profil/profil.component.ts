@@ -114,6 +114,19 @@ export class ProfilComponent {
   }
 
 
+  /**
+   * Weist mit einem Klick ein neues, zufälliges Profilbild über die externe
+   * API pravatar.cc zu. Ein zufälliger Seed-Parameter (?u=...) sorgt dafür,
+   * dass bei jedem Klick ein anderes Bild geladen wird und die URL pro Bild
+   * stabil bleibt. Gespeichert wird erst über "Speichern" (saveAvatarChange).
+   */
+  setRandomAvatar(): void {
+    const seed = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+    this.userImage = `https://i.pravatar.cc/300?u=${seed}`;
+    this.showAvatarChoice = false;
+  }
+
+
   bigUserImg(): void {
     this.showAvatarChoice = !this.showAvatarChoice;
   }
