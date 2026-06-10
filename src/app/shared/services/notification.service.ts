@@ -9,7 +9,7 @@ import {
   collection,
   doc,
   getDoc,
-  setDoc,
+  updateDoc,
   query,
   where,
   orderBy,
@@ -177,8 +177,11 @@ export class NotificationService {
     const uid = this.activeUserId;
     runInInjectionContext(this.injector, () => {
       const ref = doc(this.firestore, 'users', uid);
-      setDoc(ref, { uLastSeen: Timestamp.now() }, { merge: true }).catch(() => {
-        /* Ignore write errors (e.g. missing permissions) */
+      // updateDoc (NOT setDoc/merge) so a deleted/missing user doc is never
+      // re-created as a partial "ghost" document containing only presence
+      // fields. If the doc no longer exists the write simply fails silently.
+      updateDoc(ref, { uLastSeen: Timestamp.now() }).catch(() => {
+        /* Ignore write errors (e.g. doc deleted / missing permissions) */
       });
     });
     // Active usage also advances the "read" marker (when nothing is unread).
@@ -199,8 +202,11 @@ export class NotificationService {
     const uid = this.activeUserId;
     runInInjectionContext(this.injector, () => {
       const ref = doc(this.firestore, 'users', uid);
-      setDoc(ref, { uLastRead: Timestamp.now() }, { merge: true }).catch(() => {
-        /* Ignore write errors (e.g. missing permissions) */
+      // updateDoc (NOT setDoc/merge) so a deleted/missing user doc is never
+      // re-created as a partial "ghost" document containing only presence
+      // fields.
+      updateDoc(ref, { uLastRead: Timestamp.now() }).catch(() => {
+        /* Ignore write errors (e.g. doc deleted / missing permissions) */
       });
     });
   }

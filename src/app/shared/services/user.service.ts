@@ -54,10 +54,20 @@ export class UserService {
 
     querySnapshot.forEach((docSnap) => {
       const userData = { ...(docSnap.data() as User), uId: docSnap.id };
-      allUsers.push(userData);
+      if (UserService.isRealUser(userData)) allUsers.push(userData);
     });
 
     return allUsers;
+  }
+
+  /**
+   * Filtert Geister-/Teil-Dokumente aus: Ein echter Nutzer (registriert oder
+   * Gast) besitzt immer einen nicht-leeren uName. Presence-only-Dokumente
+   * (nur uLastSeen/uLastRead), die durch nachlaufende Writes entstehen können,
+   * werden so zuverlässig ignoriert.
+   */
+  static isRealUser(user: Partial<User> | null | undefined): boolean {
+    return !!user && typeof user.uName === 'string' && user.uName.trim() !== '';
   }
 
   async getUser(userId: string | null): Promise<User> {
@@ -99,7 +109,9 @@ export class UserService {
     return runInInjectionContext(this.injector, () => {
       const usersCollection = collection(this.firestore, 'users');
       const usersQuery = query(usersCollection);
-      return collectionData(usersQuery, { idField: 'uId' }) as Observable<User[]>;
+      return (collectionData(usersQuery, { idField: 'uId' }) as Observable<User[]>).pipe(
+        map((users) => users.filter((u) => UserService.isRealUser(u)))
+      );
     });
   }
 
@@ -177,7 +189,11 @@ export class UserService {
 
   allUsers(): Promise<User[]> {
     const usersCollection = collection(this.firestore, 'users');
-    return getDocs(usersCollection).then(snap => snap.docs.map(doc => doc.data() as User));
+    return getDocs(usersCollection).then(snap =>
+      snap.docs
+        .map(doc => ({ ...(doc.data() as User), uId: doc.id }))
+        .filter(user => UserService.isRealUser(user))
+    );
   }
  
 

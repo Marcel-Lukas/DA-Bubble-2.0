@@ -103,6 +103,7 @@ export class AuthentificationService {
     return this.runInContext(async () => {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
       this.currentUid = result.user.uid;
+      await this.cleanupGhostUsers(this.currentUid!);
       const userRef = collection(this.firestore, 'users');
       const userDocRef = doc(userRef, this.currentUid!);
       await updateDoc(userDocRef, { uStatus: true });
@@ -115,6 +116,7 @@ export class AuthentificationService {
     return this.runInContext(async () => {
       const result = await signInWithPopup(this.auth, provider);
       this.currentUid = result.user.uid;
+      await this.cleanupGhostUsers(this.currentUid!);
       const userData: UserInterface = {
         uId: this.currentUid!,
         uName: result.user.displayName || '',
@@ -153,33 +155,44 @@ export class AuthentificationService {
   }
 
   /**
-   * Bereinigt verwaiste Gast-Dokumente und ermittelt einen freien,
+   * Bereinigt verwaiste Gast- und Geister-Dokumente und ermittelt einen freien,
    * fortlaufend nummerierten Gast-Namen (Gast, Gast2, Gast3 …).
    *
-   * Nur OFFLINE/verwaiste Gäste (kein aktueller Heartbeat) werden gelöscht,
-   * damit gleichzeitig aktive Gäste NICHT rausgeworfen werden. Aktive Gäste
-   * behalten ihren Platz; der neue Gast bekommt die nächste freie Nummer.
+   * Gelöscht werden:
+   * - Geister-Dokumente: Teil-Dokumente ohne Namen (uName fehlt/leer), die z.B.
+   *   durch einen nachlaufenden Presence-Write auf ein bereits gelöschtes Doc
+   *   entstehen konnten.
+   * - OFFLINE/verwaiste Gäste (leere E-Mail, kein aktueller Heartbeat).
    *
-   * @param currentUid UID des sich gerade anmeldenden Gasts (wird nie gelöscht).
+   * Gleichzeitig AKTIVE Gäste werden NICHT gelöscht und behalten ihren Platz;
+   * der neue Gast bekommt die nächste freie Nummer. Das eigene Dokument
+   * (currentUid) wird nie gelöscht.
+   *
+   * @param currentUid UID des sich gerade anmeldenden Nutzers (wird nie gelöscht).
    * @returns Der zu vergebende Gast-Name (z.B. "Gast" oder "Gast2").
    */
   private async cleanupOrphanedGuests(currentUid: string): Promise<string> {
     try {
       return await this.runInContext(async () => {
         const usersCollection = collection(this.firestore, 'users');
-        const guestQuery = query(usersCollection, where('uEmail', '==', ''));
-        const snapshot = await getDocs(guestQuery);
+        const snapshot = await getDocs(usersCollection);
 
         const activeGuestNames: string[] = [];
         const deletions: Promise<void>[] = [];
 
         snapshot.docs.forEach((docSnap) => {
           if (docSnap.id === currentUid) return;
-          const data = docSnap.data() as UserInterface;
-          if (NotificationService.isUserOnline(data)) {
-            activeGuestNames.push(data.uName ?? '');
-          } else {
+          const data = docSnap.data() as Partial<UserInterface>;
+          const name = (data.uName ?? '').trim();
+          const isGhost = name === '';
+          const isGuest = (data.uEmail ?? '') === '';
+
+          if (isGhost) {
             deletions.push(deleteDoc(doc(usersCollection, docSnap.id)));
+          } else if (isGuest && !NotificationService.isUserOnline(data)) {
+            deletions.push(deleteDoc(doc(usersCollection, docSnap.id)));
+          } else if (isGuest) {
+            activeGuestNames.push(name);
           }
         });
 
@@ -187,8 +200,34 @@ export class AuthentificationService {
         return this.generateGuestName(activeGuestNames);
       });
     } catch (cleanupErr) {
-      console.warn('Bereinigung alter Gast-Dokumente fehlgeschlagen', cleanupErr);
+      console.warn('Bereinigung alter Gast-/Geister-Dokumente fehlgeschlagen', cleanupErr);
       return 'Gast';
+    }
+  }
+
+  /**
+   * Entfernt ausschließlich Geister-Dokumente (Teil-Dokumente ohne Namen).
+   * Wird bei jedem Login aufgerufen, damit verwaiste Presence-only-Docs nicht
+   * in den Listen auftauchen. Gast-Nummerierung ist hier irrelevant.
+   *
+   * @param currentUid UID des angemeldeten Nutzers (wird nie gelöscht).
+   */
+  private async cleanupGhostUsers(currentUid: string): Promise<void> {
+    try {
+      await this.runInContext(async () => {
+        const usersCollection = collection(this.firestore, 'users');
+        const snapshot = await getDocs(usersCollection);
+        const deletions = snapshot.docs
+          .filter((docSnap) => docSnap.id !== currentUid)
+          .filter((docSnap) => {
+            const data = docSnap.data() as Partial<UserInterface>;
+            return (data.uName ?? '').trim() === '';
+          })
+          .map((docSnap) => deleteDoc(doc(usersCollection, docSnap.id)));
+        await Promise.all(deletions);
+      });
+    } catch (cleanupErr) {
+      console.warn('Bereinigung der Geister-Dokumente fehlgeschlagen', cleanupErr);
     }
   }
 

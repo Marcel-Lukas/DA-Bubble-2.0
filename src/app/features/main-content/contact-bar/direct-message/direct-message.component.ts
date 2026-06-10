@@ -85,15 +85,21 @@ export class DirectMessageComponent implements OnInit, OnDestroy {
 
   /**
    * Entscheidet, ob ein Nutzer in der Direktnachrichten-Liste sichtbar ist.
+   * - Geister-/Teil-Dokumente ohne Namen (z.B. nur Presence-Felder) werden
+   *   grundsätzlich ausgeblendet.
    * - Das eigene Konto ist immer sichtbar.
    * - Registrierte Nutzer (mit E-Mail) sind immer sichtbar.
-   * - Gäste (leere E-Mail) sind nur sichtbar, wenn sie aktuell online sind,
-   *   damit verwaiste Gast-Dokumente nicht auftauchen, ein aktiver Gast aber
-   *   angeschrieben werden kann.
+   * - Gäste (leere/fehlende E-Mail) sind nur sichtbar, wenn sie aktuell online
+   *   sind, damit verwaiste Gast-Dokumente nicht auftauchen, ein aktiver Gast
+   *   aber angeschrieben werden kann.
    */
   private isVisibleUser(user: User): boolean {
+    // Geister-Dokumente (kein Name) niemals anzeigen – auch nicht das eigene.
+    if (!user.uName || user.uName.trim() === '') return false;
     if (user.uId === this.activeUserId) return true;
-    if (user.uEmail !== '') return true;
+    // Vollwertige (registrierte) Nutzer haben eine nicht-leere E-Mail.
+    if (user.uEmail && user.uEmail !== '') return true;
+    // Verbleibend: Gäste (leere/fehlende E-Mail) – nur wenn online.
     return this.isOnline(user);
   }
 
