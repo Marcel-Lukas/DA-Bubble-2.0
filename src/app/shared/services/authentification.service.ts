@@ -142,7 +142,7 @@ export class AuthentificationService {
         uId: this.currentUid!,
         uName: guestName,
         uEmail: '',
-        uUserImage: 'assets/img/profile.png',
+        uUserImage: this.buildGuestAvatarUrl(this.currentUid!),
         uStatus: true,
         uLastReactions: ['👍', '🙏🏻', '🔥'],
       };
@@ -245,6 +245,18 @@ export class AuthentificationService {
     let index = 2;
     while (taken.has(`Gast${index}`)) index++;
     return `Gast${index}`;
+  }
+
+  /**
+   * Baut eine zufällige, aber pro Gast stabile Avatar-URL über pravatar.cc.
+   * Die UID dient als Seed (?u=<uid>), damit jeder Gast ein eigenes Bild
+   * erhält und es über Reloads/Re-Renders hinweg gleich bleibt.
+   *
+   * @param uid UID des Gasts (Seed für das Bild).
+   * @returns Vollständige Bild-URL.
+   */
+  private buildGuestAvatarUrl(uid: string): string {
+    return `https://i.pravatar.cc/300?u=${encodeURIComponent(uid)}`;
   }
 
   /**
