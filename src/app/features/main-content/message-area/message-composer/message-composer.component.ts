@@ -33,6 +33,10 @@ import { ImageFallbackDirective } from '../../../../shared/directives/image-fall
   templateUrl: './message-composer.component.html',
   styleUrls: ['./message-composer.component.scss'],
 })
+/**
+ * Message input with @user / #channel autocomplete, an emoji picker and a
+ * cooldown-based spam guard. Emits the trimmed text via `messageSend`.
+ */
 export class MessageComposerComponent implements OnDestroy {
   @Input() placeholder = 'Nachricht schreiben …';
 
@@ -51,11 +55,11 @@ export class MessageComposerComponent implements OnDestroy {
 
   newMessageText = '';
 
-  /** Mindestabstand zwischen zwei Nachrichten in Millisekunden (Spamschutz). */
+  /** Minimum delay between two messages in milliseconds (spam guard). */
   private readonly sendCooldownMs = 1555;
-  /** Zeitstempel der zuletzt gesendeten Nachricht. */
+  /** Timestamp of the most recently sent message. */
   private lastSentAt = 0;
-  /** Steuert die kurze visuelle Rückmeldung bei zu schnellem Senden. */
+  /** Drives the brief visual feedback when sending too fast. */
   isRateLimited = false;
   private rateLimitTimeout?: ReturnType<typeof setTimeout>;
 
@@ -70,6 +74,7 @@ export class MessageComposerComponent implements OnDestroy {
     clearTimeout(this.rateLimitTimeout);
   }
 
+  /** Sends on Enter; Shift+Enter inserts a newline instead. */
   handleKeyDown(event: KeyboardEvent) {
     if (
       event.key === 'Enter' &&
@@ -81,6 +86,10 @@ export class MessageComposerComponent implements OnDestroy {
     }
   }
 
+  /**
+   * Detects an in-progress @/# mention left of the caret and triggers the
+   * matching user/channel search. A space in the token cancels the suggestion.
+   */
   onTextChange(event: Event) {
     const txtArea = event.target as HTMLTextAreaElement;
     const caretPos = txtArea.selectionStart || 0;
@@ -175,8 +184,8 @@ export class MessageComposerComponent implements OnDestroy {
   }
 
   /**
-   * Ermittelt das Ende des aktuell getippten Mention-Tokens
-   * (vom `@`/`#` bis zum nächsten Leerzeichen oder Textende).
+   * Finds the end of the mention token currently being typed (from the `@`/`#`
+   * up to the next space or the end of the text).
    */
   private findMentionEnd(mentionPos: number): number {
     const nextSpace = this.newMessageText.indexOf(' ', mentionPos + 1);
@@ -212,6 +221,7 @@ export class MessageComposerComponent implements OnDestroy {
     this.isEmojiPickerOpen = false;
   }
 
+  /** Closes the emoji picker when clicking outside it and its toggle button. */
   @HostListener('document:click', ['$event'])
   closePickerOnOutside(event: MouseEvent) {
     if (!this.isEmojiPickerOpen) return;
@@ -225,8 +235,8 @@ export class MessageComposerComponent implements OnDestroy {
     const trimmed = this.newMessageText.trim();
     if (!trimmed) return;
 
-    // Spamschutz: Nachricht blockieren, wenn der Cooldown noch nicht abgelaufen
-    // ist. Gilt gleichermaßen für registrierte User und Gäste.
+    // Spam guard: block the message while the cooldown has not elapsed.
+    // Applies equally to registered users and guests.
     const now = Date.now();
     if (now - this.lastSentAt < this.sendCooldownMs) {
       this.triggerRateLimitFeedback();
@@ -240,8 +250,8 @@ export class MessageComposerComponent implements OnDestroy {
   }
 
   /**
-   * Zeigt eine kurze visuelle Rückmeldung, dass zu schnell gesendet wurde.
-   * Der Hinweis verschwindet automatisch nach kurzer Zeit wieder.
+   * Shows brief visual feedback that the user sent too fast. The hint clears
+   * itself automatically after a short delay.
    */
   private triggerRateLimitFeedback() {
     this.isRateLimited = true;

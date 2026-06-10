@@ -40,6 +40,7 @@ export class SearchBarComponent {
     threadId: string;
   }>();
 
+  /** Closes the search results panel when clicking outside the search bar. */
   @HostListener('document:click', ['$event'])
   onGlobalClick(event: MouseEvent) {
     const clickedInside = this.searchWrapper?.nativeElement.contains(
@@ -50,6 +51,7 @@ export class SearchBarComponent {
     }
   }
 
+  /** Shows the results panel only once at least 3 characters were entered. */
   onKey(event: KeyboardEvent) {
     const input = (event.target as HTMLInputElement).value;
     this.searchValue = input;

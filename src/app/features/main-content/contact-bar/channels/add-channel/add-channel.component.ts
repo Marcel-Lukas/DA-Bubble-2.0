@@ -13,6 +13,11 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './add-channel.component.scss',
 })
 
+/**
+ * Dialog for creating a new channel. Step 1 collects name + description (with
+ * a debounced uniqueness check), step 2 adds members. Closes with a slide-out
+ * animation when clicking outside.
+ */
 export class AddChannelComponent{
   @Output() close = new EventEmitter<void>();
   @Input() activeUserId!: string | null;
@@ -30,6 +35,7 @@ export class AddChannelComponent{
   constructor( private elRef: ElementRef, private channelService: ChannelService) {}
 
   ngOnInit(): void {
+    // Debounced live check whether the typed channel name already exists.
     this.nameCheck$
       .pipe(
         debounceTime(300),
@@ -41,6 +47,7 @@ export class AddChannelComponent{
   }
 
   
+  /** Closes the dialog (with animation) when clicking outside its panel. */
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     const clickedInside = this.elRef.nativeElement
@@ -76,6 +83,7 @@ export class AddChannelComponent{
   }
 
 
+  /** Stores the entered details and advances to the add-members step. */
   addNewChannel(name: string, description: string){
     if (!name || !this.activeUserId) return;
     this.channelName = name;

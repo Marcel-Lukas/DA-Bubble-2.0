@@ -12,6 +12,10 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
   styleUrl: './member-list.component.scss'
 })
 
+/**
+ * Presentational list of a channel's members with online status. Emits events
+ * to add a new member or to open a member's profile.
+ */
 export class MemberListComponent {
   @Input() channelMembers: User[] = [];
   @Input() activeUserId!: string | null;

@@ -23,6 +23,11 @@ import { MemberListComponent } from '../../../general-components/member-list/mem
   styleUrl: './channel-members.component.scss',
 })
 
+/**
+ * Popup listing a channel's members. Toggles between the member list and the
+ * "add members" view, opens individual member profiles and closes on an
+ * outside click.
+ */
 export class ChannelMembersComponent{
   @Input() channelMembers: User[] = [];
   @Input() activeUserId: string | null = null;
@@ -43,6 +48,7 @@ export class ChannelMembersComponent{
   }
 
 
+  /** Closes the active panel when the overlay (outside the panel) is clicked. */
   onOverlayClick(event: MouseEvent) {
     const target = event.target as Node;
     if (this.newChannelMembers) {

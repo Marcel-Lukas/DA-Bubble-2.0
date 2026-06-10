@@ -21,6 +21,11 @@ import { Subject } from 'rxjs';
   styleUrl: './channel-leave.component.scss',
 })
 
+/**
+ * Channel details panel: shows/edits the channel name and description, lists
+ * members (with add/profile actions) and lets the user leave the channel
+ * (with a confirmation step).
+ */
 export class ChannelLeaveComponent implements OnInit{
   firestore = inject(Firestore);
   @Input() channelData: Channel | null = null;
@@ -77,6 +82,7 @@ export class ChannelLeaveComponent implements OnInit{
   }
 
 
+  /** Live-checks name uniqueness; skips when unchanged or shorter than 3 chars. */
   async onNameInput(value: string) {
     this.editedChannelName = value;
     const trimmed = value.trim();

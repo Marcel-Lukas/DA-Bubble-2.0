@@ -16,6 +16,10 @@ import { User } from '../interfaces/user.interface';
 import { Observable, map } from 'rxjs';
 import { Channel } from '../interfaces/channel.interface';
 
+/**
+ * Firestore data access for user documents (real-time reads, lookups,
+ * profile updates) plus the channel creation helper used by the UI.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -24,6 +28,10 @@ export class UserService {
   private injector = inject(Injector);
 
 
+  /**
+   * Streams a single user in real time. Emits `null` when the document is
+   * deleted (e.g. a guest logging out), so an open DM chat can be closed.
+   */
   getUserRealtime(userId: string): Observable<User | null> {
     return new Observable<User | null>((subscriber) => {
       const unsubscribe = runInInjectionContext(this.injector, () => {
@@ -61,10 +69,10 @@ export class UserService {
   }
 
   /**
-   * Filtert Geister-/Teil-Dokumente aus: Ein echter Nutzer (registriert oder
-   * Gast) besitzt immer einen nicht-leeren uName. Presence-only-Dokumente
-   * (nur uLastSeen/uLastRead), die durch nachlaufende Writes entstehen können,
-   * werden so zuverlässig ignoriert.
+   * Filters out ghost/partial documents: a real user (registered or guest)
+   * always has a non-empty uName. Presence-only documents (only
+   * uLastSeen/uLastRead), which can arise from trailing writes, are reliably
+   * ignored this way.
    */
   static isRealUser(user: Partial<User> | null | undefined): boolean {
     return !!user && typeof user.uName === 'string' && user.uName.trim() !== '';
@@ -115,6 +123,10 @@ export class UserService {
     });
   }
 
+  /**
+   * Updates the user's "recently used reactions" (capped at two), moving the
+   * given reaction to the front so the most recent ones are offered first.
+   */
   async editLastReactions(
     userId: string | null,
     reaction: string
@@ -138,11 +150,15 @@ export class UserService {
       const lastReactions = userData.uLastReactions || [];
       const index = lastReactions.indexOf(reaction);
 
+      // Keep the most-recently-used reactions list (max 2) ordered by recency.
       if (index === 0) {
+        // Already the most recent -> nothing to do.
       } else if (index > 0) {
+        // Present but not first -> move it to the front.
         lastReactions.splice(index, 1);
         lastReactions.unshift(reaction);
       } else {
+        // New reaction -> prepend and drop the oldest if over the limit.
         lastReactions.unshift(reaction);
         if (lastReactions.length > 2) {
           lastReactions.pop();
@@ -151,7 +167,7 @@ export class UserService {
 
       await updateDoc(userDocRef, { uLastReactions: lastReactions });
     } catch (error) {
-      console.error('Fehler beim Editieren der LastReactions:', error);
+      console.error('Error while editing the last reactions:', error);
     }
   }
 

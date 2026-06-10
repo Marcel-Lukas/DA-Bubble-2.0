@@ -25,6 +25,11 @@ import { MessageService } from '../../../../shared/services/message.service';
   templateUrl: './user-name.component.html',
   styleUrl: './user-name.component.scss',
 })
+/**
+ * Header widget showing the current user's avatar/name and a flyout with the
+ * profile and logout actions. Closes on outside clicks (with a slide-out
+ * animation on small screens).
+ */
 export class UserNameComponent {
   private authService = inject(AuthentificationService);
   private channelService = inject(ChannelService);
@@ -33,7 +38,7 @@ export class UserNameComponent {
   isLogOutVisible: boolean = false;
   showProfil: boolean = false;
   userStatus: boolean | string = false;
-  /** Letztes Lebenszeichen (uLastSeen) für die Presence-Erkennung. */
+  /** Last sign of life (uLastSeen) used for presence detection. */
   userLastSeen: unknown = null;
   userName: string = '';
   userEmail: string = '';
@@ -82,7 +87,6 @@ export class UserNameComponent {
           this.animateOut = false;
         }, 800);
       } else {
-        console.log('nicht drin');
         this.isLogOutVisible = false;
         this.animateOut = false;
       }
@@ -95,6 +99,7 @@ export class UserNameComponent {
     this.toggleLogOut();
   }
 
+  /** Closes the logout/profile flyout when clicking outside its triggers. */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const clickedInsideLogOut = this.logOutBox?.nativeElement?.contains(
@@ -132,8 +137,12 @@ export class UserNameComponent {
     this.showProfil = true;
   }
 
+  /**
+   * Logs the user out. Guests (identified by an empty email – their name can be
+   * Gast, Gast2, …) additionally have their created channels and sent messages
+   * removed so they leave no leftover data behind.
+   */
   async logOut() {
-    // Gäste werden über die leere E-Mail erkannt (uName kann Gast, Gast2, … sein).
     if (this.userEmail === '') {
       await this.channelService.deleteChannelsByCreator(this.activeUserId!);
       await this.messageService.deleteMessagesBySender(this.activeUserId!);

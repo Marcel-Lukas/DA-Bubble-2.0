@@ -1,35 +1,34 @@
 import { Directive, HostListener, Input } from '@angular/core';
 
 /**
- * Setzt bei einem Lade-/Netzwerkfehler eines Bildes automatisch ein
- * Fallback-Bild. Wird vor allem für Gast-Avatare genutzt, deren Bild über die
- * externe API (https://i.pravatar.cc) geladen wird – ist diese mal nicht
- * erreichbar, wird transparent auf das lokale Standardbild zurückgefallen.
+ * Automatically swaps in a fallback image when an image fails to load. Used
+ * mainly for guest avatars whose image is loaded from the external API
+ * (https://i.pravatar.cc) – if it is unreachable, the local default image is
+ * shown transparently instead.
  *
- * Verwendung:
+ * Usage:
  *   <img [src]="user.uUserImage" appImageFallback />
- *   <img [src]="user.uUserImage" appImageFallback="assets/img/anderes.png" />
+ *   <img [src]="user.uUserImage" appImageFallback="assets/img/other.png" />
  */
 @Directive({
   selector: 'img[appImageFallback]',
   standalone: true,
 })
 export class ImageFallbackDirective {
-  /** Pfad zum Fallback-Bild (Standard: lokales profile.png). */
+  /** Path to the fallback image (default: local profile.png). */
   @Input() appImageFallback: string = 'assets/img/profile.png';
 
   /**
-   * Wird ausgelöst, wenn das Bild nicht geladen werden kann. Tauscht die
-   * Quelle einmalig gegen das Fallback-Bild aus. Eine Schleife (Fallback
-   * schlägt ebenfalls fehl) wird vermieden, indem danach kein weiterer
-   * Tausch erfolgt.
+   * Fires when the image cannot be loaded. Swaps the source once for the
+   * fallback image. A loop (fallback also failing) is avoided by not swapping
+   * again afterwards.
    */
   @HostListener('error', ['$event'])
   onError(event: Event): void {
     const img = event.target as HTMLImageElement | null;
     if (!img) return;
     const fallback = this.appImageFallback || 'assets/img/profile.png';
-    // Endlosschleife verhindern: nur tauschen, wenn nicht schon das Fallback.
+    // Prevent an infinite loop: only swap if not already showing the fallback.
     if (img.src.endsWith(fallback)) return;
     img.src = fallback;
   }

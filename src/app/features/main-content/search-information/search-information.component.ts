@@ -42,10 +42,16 @@ interface ThreadHit {
   templateUrl: './search-information.component.html',
   styleUrl: './search-information.component.scss',
 })
+/**
+ * Global search results view. For a given query it surfaces matching users,
+ * channels, channel messages, direct messages and thread replies, and lets the
+ * user jump straight into the corresponding chat or thread.
+ */
 export class SearchInformationComponent implements OnInit {
   private _searchText = '';
   private route = inject(ActivatedRoute);
 
+  /** Setter that normalizes the query and re-runs the search on each change. */
   @Input() set searchText(value: string) {
     this._searchText = value.trim().toLowerCase();
     this.handleSearch(this._searchText);
@@ -86,6 +92,7 @@ export class SearchInformationComponent implements OnInit {
     this.activeUserId = this.route.snapshot.paramMap.get('activeUserId');
   }
 
+  /** Runs all category searches in parallel; ignores queries shorter than 3. */
   private async handleSearch(searchText: string) {
     if (!searchText || searchText.length < 3) return;
 
@@ -164,6 +171,10 @@ export class SearchInformationComponent implements OnInit {
       });
   }
 
+  /**
+   * Finds matching thread replies and resolves each parent message to derive
+   * the chat the thread belongs to (channel vs. private + its chatId).
+   */
   private async findThreadMsgs(msgs: Message[], q: string) {
     const hits: ThreadHit[] = [];
     for (const m of msgs) {
@@ -197,6 +208,7 @@ export class SearchInformationComponent implements OnInit {
     );
   }
 
+  // Each flag is true when its category has NO results (used to hide sections).
   private updateVisibilityFlags() {
     this.showContact = !this.users.length;
     this.showChannels = !this.channelsWithNames.length;

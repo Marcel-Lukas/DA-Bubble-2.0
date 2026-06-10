@@ -46,6 +46,13 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
   templateUrl: './message-area.component.html',
   styleUrls: ['./message-area.component.scss'],
 })
+/**
+ * Central chat view. Renders messages for the active target (private DM,
+ * channel or thread), keeps channel/partner data and members in sync via
+ * real-time subscriptions, handles composing/sending and the "new message"
+ * search, and reacts to channel/partner deletions by emitting events so the
+ * parent can close the chat.
+ */
 export class MessageAreaComponent implements OnChanges, OnDestroy {
   private userService = inject(UserService);
   private channelService = inject(ChannelService);
@@ -66,12 +73,12 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     chatType: 'private' | 'channel';
     chatId: string;
   }>();
-  /** Wird ausgelöst, wenn der aktuell geöffnete Channel gelöscht wurde. */
+  /** Emitted when the currently open channel was deleted. */
   @Output() channelDeleted = new EventEmitter<void>();
   /**
-   * Wird ausgelöst, wenn der Gesprächspartner des offenen Privat-Chats nicht
-   * mehr existiert (z.B. ein Gast hat sich abgemeldet -> sein Dokument wurde
-   * gelöscht). Der Chat soll dann beim Gegenüber geschlossen werden.
+   * Emitted when the partner of the open private chat no longer exists (e.g. a
+   * guest logged out -> their document was deleted). The chat should then be
+   * closed on the other side.
    */
   @Output() chatPartnerDeleted = new EventEmitter<void>();
 
@@ -147,6 +154,11 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     this.threadReplyCount = 0;
   }
 
+  /**
+   * Applies a new message snapshot. Scrolls to the bottom when messages were
+   * added and focuses the composer on the very first load. For threads it also
+   * derives the reply count and the parent's context name.
+   */
   private handleIncomingMessages(msgs: Message[]) {
     const initial = this.messages.length === 0;
     const more    = msgs.length > this.messages.length;
@@ -199,14 +211,14 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
       .subscribe({
         next: (u) => {
           if (!u) {
-            // Gesprächspartner existiert nicht mehr (z.B. Gast hat sich
-            // ausgeloggt -> sein Dokument wurde gelöscht). Chat schließen.
+            // Partner no longer exists (e.g. guest logged out -> their
+            // document was deleted). Close the chat.
             this.handleDeletedChatPartner();
             return;
           }
           this.chatPartner = u;
         },
-        error: (err) => console.error('User-Live', err),
+        error: (err) => console.error('User live subscription failed', err),
       });
   }
 
@@ -227,7 +239,7 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
       .subscribe({
         next: (ch) => {
           if (!ch) {
-            // Channel wurde gelöscht -> Chat für alle schließen
+            // Channel was deleted -> close the chat for everyone.
             this.handleDeletedChannel();
             return;
           }
@@ -235,15 +247,15 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
             this.activeUserId &&
             !ch.cUserIds?.includes(this.activeUserId)
           ) {
-            // Aktueller Nutzer ist kein Mitglied mehr (z.B. Channel verlassen
-            // oder von einem Admin entfernt) -> Chat schließen.
+            // Current user is no longer a member (e.g. left the channel or was
+            // removed by an admin) -> close the chat.
             this.handleDeletedChannel();
             return;
           }
           this.channelData = ch;
           this.loadChannelMembers();
         },
-        error: (err) => console.error('Channel-Realtime', err),
+        error: (err) => console.error('Channel realtime subscription failed', err),
       });
   }
 
@@ -274,7 +286,7 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     for (const uid of this.channelData.cUserIds) {
       const sub = this.userService.getUserRealtime(uid).subscribe({
         next: (u) => this.mergeMember(u),
-        error: (err) => console.error('User-Realtime', err),
+        error: (err) => console.error('User realtime subscription failed', err),
       });
       this.channelMemberSubs.push(sub);
     }
@@ -286,6 +298,7 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     idx > -1 ? (this.channelMembers[idx] = u) : this.channelMembers.push(u);
     this.sortMembers();
   }
+  /** Keeps the active user pinned to the top of the member list. */
   private sortMembers() {
     this.channelMembers.sort((a, b) => {
       if (a.uId === this.activeUserId) return -1;
@@ -343,6 +356,11 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     this.addMemberPopUp = false;
   }
 
+  /**
+   * Drives the "new message" autocomplete. The first character selects the
+   * search mode: `@` searches users by name, `#` searches channels, anything
+   * else searches users by email.
+   */
   onNewInputChange() {
     const val = this.newChatInput.trim();
     this.showNewSuggestions = !!val;
@@ -404,7 +422,7 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     const txt = this.newMessageText.trim();
     if (!txt) return;
 
-    // In Channels nur senden, wenn der Channel noch existiert (nicht gelöscht).
+    // Guard against a race: only send to a channel that still exists.
     if (this.chatType === 'channel') {
       if (!this.chatId || !this.channelData) {
         this.newMessageText = '';
@@ -433,6 +451,7 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
     setTimeout(() => this.scrollToBottom(), 1000);
   }
 
+  /** True when message `i` starts a new calendar day (renders a date divider). */
   shouldShowDateSeparator(i: number): boolean {
     if (i === 0) return true;
     return (
@@ -440,6 +459,7 @@ export class MessageAreaComponent implements OnChanges, OnDestroy {
       this.getDay(this.messages[i - 1].mTime)
     );
   }
+  /** Normalizes any timestamp (Firestore Timestamp/Date/number) to midnight ms. */
   private getDay(t: any): number {
     const d = t?.toDate?.() ?? t ?? new Date(t);
     return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();

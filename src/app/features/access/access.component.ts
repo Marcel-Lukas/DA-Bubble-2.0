@@ -15,6 +15,11 @@ import { VisibleButtonService } from '../../shared/services/visible-button.servi
   templateUrl: './access.component.html',
   styleUrl: './access.component.scss'
 })
+/**
+ * Shell for the authentication area. Renders the active sub-view (login,
+ * sign-up, imprint, password reset, etc.) via `NgComponentOutlet` driven by
+ * the {@link ComponentSwitcherService}.
+ */
 export class AccessComponent implements OnInit {
   private visibleBtn = inject(VisibleButtonService);
 
@@ -32,6 +37,7 @@ export class AccessComponent implements OnInit {
     this.isAnimation();
   }
 
+  /** Shows the intro logo animation only once per browser (localStorage flag). */
   isAnimation() {
     const animationShown = localStorage.getItem('showAnimation');
     if (animationShown === 'true') {
@@ -39,6 +45,7 @@ export class AccessComponent implements OnInit {
     }
   }
 
+  /** Opens the reset-password view when arriving via the Firebase reset link. */
   handleResetMode() {
     const mode = this.route.snapshot.queryParamMap.get('mode');
     if (mode === 'resetPassword') {

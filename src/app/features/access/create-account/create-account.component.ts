@@ -14,6 +14,10 @@ import { AuthentificationService } from '../../../shared/services/authentificati
 import { CustomInputComponent } from '../../general-components/custom-input/custom-input.component';
 import { Subscription } from 'rxjs';
 
+/**
+ * Requires the password to contain at least one upper- and lowercase letter,
+ * a digit and a special character. Empty values pass (handled by `required`).
+ */
 function strongPasswordValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value as string;
@@ -69,6 +73,10 @@ export class CreateAccountComponent implements OnInit, OnDestroy {
     this.registerUser(regEmail, regPassword, regName);
   }
 
+  /**
+   * Validates the email and stores the registration data, then advances to the
+   * avatar selection step (the account is only created once an avatar is set).
+   */
   private registerUser(email: string, password: string, name: string): void {
     this.authService.prepareRegistration(email, password, name)
     .then(() => this.changeComponent('avatar'))

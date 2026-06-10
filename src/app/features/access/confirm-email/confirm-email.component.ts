@@ -19,6 +19,7 @@ import { VisibleButtonService } from '../../../shared/services/visible-button.se
   templateUrl: './confirm-email.component.html',
   styleUrl: './confirm-email.component.scss',
 })
+/** Form that triggers a password-reset email for the entered address. */
 export class ConfirmEmailComponent implements OnInit, OnDestroy {
   private visibleBtn = inject(VisibleButtonService);
 
@@ -65,6 +66,7 @@ export class ConfirmEmailComponent implements OnInit, OnDestroy {
     .catch(error => this.handleSendError(error));
   }
   
+  /** Shows the success indicator, then advances to the "check your inbox" view. */
   private handleSendSuccess(): void {
     this.toggleConfirmation(true);
     setTimeout(() => this.toggleConfirmation(false), 2000);

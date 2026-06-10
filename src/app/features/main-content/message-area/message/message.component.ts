@@ -35,14 +35,14 @@ import { ImageFallbackDirective } from '../../../../shared/directives/image-fall
 // emoji picker.
 
 /**
- * Ein Teilstück eines Nachrichtentextes für das Rendern. Reiner Text oder
- * eine Erwähnung eines Users (`@`) bzw. eines Channels (`#`).
+ * A slice of a message text used for rendering: either plain text or a mention
+ * of a user (`@`) or a channel (`#`).
  */
 export interface MessageSegment {
   type: 'text' | 'user' | 'channel';
-  /** Anzuzeigender Text (z.B. `@Max`, `#general` oder reiner Text). */
+  /** Text to display (e.g. `@Max`, `#general` or plain text). */
   label: string;
-  /** Id des referenzierten Users/Channels, falls auflösbar. */
+  /** Id of the referenced user/channel, if resolvable. */
   refId?: string;
 }
 
@@ -53,6 +53,11 @@ export interface MessageSegment {
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
 })
+/**
+ * Renders a single chat message: sender info, parsed text with @/# mentions,
+ * grouped reactions, inline editing, deletion and thread preview. Uses OnPush
+ * change detection with explicit markForCheck() after async updates.
+ */
 export class MessageComponent implements OnInit {
   private userService = inject(UserService);
   private channelService = inject(ChannelService);
@@ -71,7 +76,7 @@ export class MessageComponent implements OnInit {
 
   @Output() profileClick = new EventEmitter<string>();
   @Output() threadOpen = new EventEmitter<string>();
-  /** Klick auf eine Channel-Erwähnung (`#channel`) im Nachrichtentext. */
+  /** Click on a channel mention (`#channel`) within the message text. */
   @Output() channelMentionClick = new EventEmitter<string>();
 
   @ViewChild('emojiPicker', { read: ElementRef }) emojiPickerRef?: ElementRef;
@@ -84,7 +89,7 @@ export class MessageComponent implements OnInit {
   activeUserData: User | null = null;
   senderData: User | null = null;
   groupedReactions: GroupedReaction[] = [];
-  /** Aufbereiteter Nachrichtentext mit hervorgehobenen Erwähnungen. */
+  /** Pre-processed message text with highlighted mentions. */
   messageSegments: MessageSegment[] = [];
   shownReactionNumber = 7;
   editText = '';
@@ -127,7 +132,7 @@ export class MessageComponent implements OnInit {
           this.senderData = u;
           this.cdr.markForCheck();
         },
-        error: (err) => console.error('Sender-Live', err),
+        error: (err) => console.error('Sender live subscription failed', err),
       });
   }
 
@@ -141,7 +146,7 @@ export class MessageComponent implements OnInit {
           this.activeUserData = u;
           this.cdr.markForCheck();
         },
-        error: (err) => console.error('User-Live', err),
+        error: (err) => console.error('User live subscription failed', err),
       });
   }
 
@@ -172,15 +177,15 @@ export class MessageComponent implements OnInit {
         : [];
   }
 
-  // ---- Mention-Aufbereitung ------------------------------------------------
+  // ---- Mention processing --------------------------------------------------
 
-  /** Bekannte User-/Channel-Namen für die Auflösung von Erwähnungen. */
+  /** Known user/channel names used to resolve mentions. */
   private knownUsers: User[] = [];
   private knownChannels: Channel[] = [];
 
   /**
-   * Lädt einmalig alle User und Channels, um Erwähnungen im Nachrichtentext
-   * auf konkrete Ids auflösen zu können, und parst danach den Text.
+   * Loads all users and channels once so mentions in the message text can be
+   * resolved to concrete ids, then parses the text.
    */
   private loadMentionData(): void {
     Promise.all([
@@ -193,15 +198,14 @@ export class MessageComponent implements OnInit {
         this.parseMessageText();
         this.cdr.markForCheck();
       })
-      .catch((err) => console.error('Mention-Daten', err));
+      .catch((err) => console.error('Loading mention data failed', err));
   }
 
   /**
-   * Zerlegt `message.mText` in Text- und Erwähnungs-Segmente. An jeder
-   * `@`/`#`-Position wird gegen die bekannten User-/Channel-Namen abgeglichen.
-   * Dadurch funktionieren auch mehrteilige Namen mit Leerzeichen wie
-   * `@Vorname Nachname`. Nur aufgelöste Erwähnungen werden hervorgehoben;
-   * andernfalls bleibt der Text unverändert stehen.
+   * Splits `message.mText` into text and mention segments. At every `@`/`#`
+   * position the text is matched against the known user/channel names. This
+   * also supports multi-word names with spaces like `@First Last`. Only
+   * resolved mentions are highlighted; otherwise the text is left unchanged.
    */
   private parseMessageText(): void {
     const text = this.message?.mText ?? '';
@@ -236,9 +240,9 @@ export class MessageComponent implements OnInit {
   }
 
   /**
-   * Versucht, an Position `pos` (dem `@`/`#`) den längsten passenden bekannten
-   * Namen zu erkennen. Liefert das Segment samt konsumierter Zeichenlänge oder
-   * `null`, wenn dort keine bekannte Erwähnung steht.
+   * Tries to detect the longest matching known name at position `pos` (the
+   * `@`/`#`). Returns the segment plus the number of consumed characters, or
+   * `null` if no known mention starts there.
    */
   private matchMentionAt(
     text: string,
@@ -253,8 +257,8 @@ export class MessageComponent implements OnInit {
         return {
           segment: {
             type: symbol === '@' ? 'user' : 'channel',
-            // Immer den kanonischen Originalnamen anzeigen, egal wie der
-            // Nutzer die Erwähnung geschrieben hat (z.B. `@peter müller`).
+            // Always show the canonical original name, regardless of how the
+            // user typed the mention (e.g. `@peter müller`).
             label: symbol + c.name,
             refId: c.id,
           },
@@ -266,8 +270,8 @@ export class MessageComponent implements OnInit {
   }
 
   /**
-   * Liefert die für das Symbol passenden Namens-Kandidaten, sortiert nach
-   * Länge absteigend, damit z.B. `@Vorname Nachname` vor `@Vorname` greift.
+   * Returns the name candidates matching the symbol, sorted by length
+   * descending so that e.g. `@First Last` is matched before `@First`.
    */
   private mentionCandidates(
     symbol: string
@@ -287,7 +291,7 @@ export class MessageComponent implements OnInit {
       .sort((a, b) => b.lowerName.length - a.lowerName.length);
   }
 
-  /** Klick auf eine Erwähnung im gerenderten Text. */
+  /** Handles a click on a mention in the rendered text. */
   onMentionClick(segment: MessageSegment): void {
     if (!segment.refId) return;
     if (segment.type === 'user') this.profileClick.emit(segment.refId);
@@ -295,6 +299,10 @@ export class MessageComponent implements OnInit {
       this.channelMentionClick.emit(segment.refId);
   }
 
+  /**
+   * Aggregates raw reactions by emoji into a view model, collecting the
+   * reacting users' names (the active user shown as "Du") for the tooltip.
+   */
   private groupReactionsWithNames(
     reactions: Reaction[],
     activeUserId: string
@@ -333,6 +341,10 @@ export class MessageComponent implements OnInit {
     }));
   }
 
+  /**
+   * Builds the "X, Y and Z" line for a reaction tooltip, pinning "Du" first and
+   * collapsing overflow beyond `max` into a "and N more" suffix.
+   */
   private buildNameLine(names: string[], max = 3): string {
     const list = [...names];
     const idxDu = list.indexOf('Du');
@@ -412,6 +424,10 @@ export class MessageComponent implements OnInit {
       .catch(console.error);
   }
 
+  /**
+   * Opens the thread for this message, starting a new thread first if the
+   * message is not yet a thread root.
+   */
   onThreadClick() {
     if (!this.message.mId) return;
 
@@ -445,6 +461,10 @@ export class MessageComponent implements OnInit {
     this.isPermanentDeleteOpen = !this.isPermanentDeleteOpen;
   }
 
+  /**
+   * Inserts the picked emoji at the caret when editing, otherwise toggles it
+   * as a reaction on the message.
+   */
   onEmojiPicked(e: any) {
     const char = e.emoji?.native ?? e.emoji;
     if (this.isEditOpen && this.editTextareaRef) {
@@ -492,6 +512,7 @@ export class MessageComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  /** Closes the emoji picker / options menu when clicking outside of them. */
   @HostListener('document:click', ['$event'])
   handleDocumentClick(ev: MouseEvent): void {
     if (this.isPermanentDeleteOpen) return;

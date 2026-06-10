@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 
+/** Available visual variants for the shared button. */
 type ButtonColor = 'blue' | 'white' | 'gray' | 'transparent' | 'sky-grey';
 
 @Component({
@@ -25,6 +26,7 @@ export class ButtonComponent {
 
   @Output() clicked = new EventEmitter<void>();
 
+  /** The gray variant is rendered full width via a host class. */
   @HostBinding('class.full-width-host') 
   get isFullWidth(): boolean {
     return this.color === 'gray';

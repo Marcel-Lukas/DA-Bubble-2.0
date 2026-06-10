@@ -7,6 +7,10 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { environment } from '../environments/environment';
 
+/**
+ * Root application providers: router, Angular animations and the Firebase
+ * backend (App, Auth and Firestore) initialized from the environment config.
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),

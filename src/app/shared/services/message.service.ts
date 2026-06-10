@@ -23,6 +23,11 @@ import { Observable } from 'rxjs';
 import { Message } from '../interfaces/message.interface';
 import { Reaction } from '../interfaces/reaction.interface';
 
+/**
+ * Firestore data access for messages across the three chat types:
+ * direct (private), channel and thread replies. Provides real-time queries,
+ * CRUD operations, reactions and bulk cleanup helpers.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -30,6 +35,7 @@ export class MessageService {
   private firestore = inject(Firestore);
   private injector = inject(Injector);
 
+  /** Maps a raw Firestore document into a fully populated Message object. */
   setNoteObject(obj: any, id: string): Message {
     return {
       mId: id || '',
@@ -62,6 +68,10 @@ export class MessageService {
     }
   }
 
+  /**
+   * Streams a direct conversation. A DM lives in two directions (A->B and
+   * B->A), so two queries are merged and re-sorted on every snapshot.
+   */
   private getPrivateMessages(
     chatId: string | null,
     activeUserId: string | null
@@ -189,7 +199,7 @@ export class MessageService {
 
   editMessageText(messageId: string, newText: string): Promise<void> {
     if (!messageId) {
-      return Promise.reject(new Error('Message ID fehlt.'));
+      return Promise.reject(new Error('Message ID is missing.'));
     }
 
     const messageRef = doc(this.firestore, 'messages', messageId);
@@ -200,7 +210,7 @@ export class MessageService {
 
   deleteMessage(messageId: string): Promise<void> {
     if (!messageId) {
-      return Promise.reject(new Error('Message ID fehlt.'));
+      return Promise.reject(new Error('Message ID is missing.'));
     }
 
     const messageRef = doc(this.firestore, 'messages', messageId);
@@ -227,6 +237,7 @@ export class MessageService {
       inBatch++;
       processed++;
 
+      // Firestore caps a write batch at 500 operations -> commit and restart.
       if (inBatch === 500) {
         batch.commit();
         batch = writeBatch(this.firestore);
@@ -240,6 +251,7 @@ export class MessageService {
     }
   }
 
+  /** Adds the reaction if absent, otherwise removes it (toggle behaviour). */
   async toggleReaction(messageId: string, reaction: Reaction): Promise<void> {
     const messageRef = doc(this.firestore, 'messages', messageId);
 
@@ -264,6 +276,7 @@ export class MessageService {
     await updateDoc(messageRef, { mReactions: newReactions });
   }
 
+  /** Opens a thread by tagging the parent message with its own id as threadId. */
   async startThread(parentMessageId: string): Promise<void> {
     const parentRef = doc(this.firestore, 'messages', parentMessageId);
     await updateDoc(parentRef, { mThreadId: parentMessageId });

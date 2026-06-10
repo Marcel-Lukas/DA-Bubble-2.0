@@ -39,6 +39,10 @@ import { ReactiveFormsModule } from '@angular/forms';
     },
   ],
 })
+/**
+ * Styled text input that integrates with Angular forms via
+ * ControlValueAccessor, so it can be used with formControlName/ngModel.
+ */
 export class CustomInputComponent implements ControlValueAccessor {
   @Input() type: string = 'text';
   @Input() name: string = '';

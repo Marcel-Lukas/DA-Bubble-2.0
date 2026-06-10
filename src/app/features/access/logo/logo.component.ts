@@ -81,6 +81,11 @@ import { take } from 'rxjs';
     ])
   ],
 })
+/**
+ * Animated splash logo shown on first visit. Orchestrates three timed states
+ * (text reveal -> logo moves to the corner -> background fades) and picks the
+ * mobile or desktop animation variant based on the viewport width.
+ */
 export class LogoComponent implements OnInit {
   logoPosition: 'center' | 'topLeft' | 'centerMobile' | 'topLeftMobile' = 'center';
   textState = 'hidden';
@@ -91,13 +96,16 @@ export class LogoComponent implements OnInit {
   constructor(private bp: BreakpointObserver) {}
 
   ngOnInit(): void {
+    // Remember that the intro animation has played (see AccessComponent).
     localStorage.setItem('showAnimation', 'true');
     
+    // One-shot breakpoint check decides which animation variant to use.
     this.bp.observe(['(max-width: 700px)']).pipe(take(1)).subscribe(result => {
       this.isMobile = result.matches;
       this.logoPosition = this.isMobile ? 'centerMobile' : 'center';
     });
 
+    // Staggered timeline: reveal text, then move logo, then fade background.
     setTimeout(() => this.textState = 'visible', 1000);
 
     setTimeout(() => {

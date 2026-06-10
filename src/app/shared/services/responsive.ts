@@ -1,6 +1,11 @@
 
 import { Component, Input, HostListener, OnInit } from '@angular/core';
 
+/**
+ * Conditionally renders its projected content based on the viewport width.
+ * The breakpoint to compare against is chosen via the `mode` input, allowing
+ * mobile/tablet/desktop-specific markup without manual resize handling.
+ */
 @Component({
   selector: 'app-device-visible',
   template: `@if (shouldShow) {
@@ -21,6 +26,7 @@ export class DeviceVisibleComponent implements OnInit {
     this.checkWidth();
   }
 
+  /** Re-evaluates visibility against the current window width on each resize. */
   @HostListener('window:resize')
   checkWidth() {
     const width = window.innerWidth;

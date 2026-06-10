@@ -11,13 +11,18 @@ type DeleteTarget = 'message' | 'channel' | 'user';
   templateUrl: './permanent-delete.component.html',
   styleUrl: './permanent-delete.component.scss',
 })
+/**
+ * Generic confirm-and-delete dialog for a message, channel or account. The
+ * `target` selects which service call runs on confirmation; channel deletion
+ * is owner-checked via `requestingUserId`.
+ */
 export class PermanentDeleteComponent {
   private messageService = inject(MessageService);
   private channelService = inject(ChannelService);
 
   @Input({ required: true }) target!: DeleteTarget;
   @Input({ required: true }) id!: any;
-  /** Id des aktuell angemeldeten Nutzers – wird zur Owner-Prüfung beim Löschen eines Channels benötigt. */
+  /** Id of the currently logged-in user – required for the owner check when deleting a channel. */
   @Input() requestingUserId: string | null = null;
 
   @Output() close = new EventEmitter<void>();
@@ -26,6 +31,7 @@ export class PermanentDeleteComponent {
     this.close.emit();
   }
 
+  /** Runs the delete operation matching the configured target, then closes. */
   onYes(): void {
     switch (this.target) {
       case 'message':
@@ -33,7 +39,7 @@ export class PermanentDeleteComponent {
           .deleteMessage(this.id)
           .then(() => this.close.emit())
           .catch((err) =>
-            console.error('Fehler beim Löschen der Nachricht', err)
+            console.error('Error while deleting the message', err)
           );
         break;
 
@@ -42,12 +48,12 @@ export class PermanentDeleteComponent {
           .deleteChannel(this.id, this.requestingUserId)
           .then(() => this.close.emit())
           .catch((err) => {
-            console.error('Fehler beim Löschen des Channels', err);
+            console.error('Error while deleting the channel', err);
             this.close.emit();
           });
         break;
       default:
-        console.warn('Unbekannter Lösch‑Typ:', this.target);
+        console.warn('Unknown delete target:', this.target);
         this.close.emit();
     }
   }

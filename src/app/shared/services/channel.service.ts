@@ -20,6 +20,7 @@ import { Channel } from '../interfaces/channel.interface';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+/** Firestore data access for channels (CRUD, membership and real-time reads). */
 @Injectable({
   providedIn: 'root',
 })
@@ -40,6 +41,10 @@ export class ChannelService {
     return allChannels;
   }
 
+  /**
+   * Streams a channel in real time. Emits `null` when the channel is deleted,
+   * so subscribers (e.g. the open chat) can react and close it.
+   */
   getChannelRealtime(channelId: string): Observable<Channel | null> {
     return new Observable<Channel | null>((observer) => {
       const unsub = runInInjectionContext(this.injector, () => {
@@ -48,7 +53,7 @@ export class ChannelService {
           if (snap.exists()) {
             observer.next({ ...(snap.data() as Channel), cId: snap.id });
           } else {
-            // Channel wurde gelöscht -> Subscriber benachrichtigen
+            // Channel was deleted -> notify subscriber with null
             observer.next(null);
           }
         });
@@ -126,6 +131,10 @@ export class ChannelService {
     await updateDoc(channelRef, { cDescription: newDescription });
   }
 
+  /**
+   * Streams the channels the user is a member of, alphabetically sorted.
+   * Includes `createdBy` so the UI can show owner-only actions (e.g. delete).
+   */
   getSortedChannels(userId: string | null): Observable<{ id: string; name: string; createdAt: any; createdBy: string }[]> {
     return runInInjectionContext(this.injector, () => {
       const channelsRef  = collection(this.firestore, 'channels');
@@ -154,7 +163,7 @@ export class ChannelService {
   
 
   /**
-   * Prüft, ob der angegebene Nutzer der Ersteller/Owner des Channels ist.
+   * Checks whether the given user is the creator/owner of the channel.
    */
   async isChannelOwner(channelId: string, userId: string | null): Promise<boolean> {
     if (!channelId || !userId) return false;
@@ -165,14 +174,14 @@ export class ChannelService {
   }
 
   /**
-   * Löscht einen Channel. Nur der Ersteller/Owner darf den Channel löschen.
-   * Wird ein anderer Nutzer übergeben, wird das Löschen verweigert.
+   * Deletes a channel. Only the creator/owner is allowed to delete it; for any
+   * other user the deletion is rejected (defense-in-depth alongside the UI).
    */
   async deleteChannel(channelId: string, requestingUserId: string | null): Promise<void> {
     if (!channelId) return;
     const isOwner = await this.isChannelOwner(channelId, requestingUserId);
     if (!isOwner) {
-      throw new Error('Nur der Ersteller des Channels darf diesen löschen.');
+      throw new Error('Only the channel creator may delete this channel.');
     }
     const channelRef = doc(this.firestore, 'channels', channelId);
     return deleteDoc(channelRef);
@@ -194,6 +203,7 @@ export class ChannelService {
       batch.delete(docSnap.ref);
       counter++;
   
+      // Firestore caps a write batch at 500 operations -> commit and restart.
       if (counter === 500) {
         batch.commit();
         batch   = writeBatch(this.firestore);

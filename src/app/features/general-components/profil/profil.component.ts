@@ -23,6 +23,11 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
   styleUrl: './profil.component.scss',
 })
 
+/**
+ * User profile popup. In view mode it shows name, email and online status and
+ * can start a DM; in edit mode (own profile) it allows changing the name and
+ * choosing/randomizing the avatar before saving.
+ */
 export class ProfilComponent {
   private originalUserImage!: string;
   
@@ -38,7 +43,7 @@ export class ProfilComponent {
   @Input() userEmail: any;
   @Input() userImage: any;
   @Input() userStatus: any;
-  /** Letztes Lebenszeichen (uLastSeen) für die Presence-Erkennung. */
+  /** Last sign of life (uLastSeen) used for presence detection. */
   @Input() userLastSeen: any;
   @Input() userId: any;
   @Input() activeUserId!: any;
@@ -50,6 +55,7 @@ export class ProfilComponent {
   constructor(private router: Router, private userService: UserService) {}
 
   ngOnInit(): void {
+    // Derive online state from presence; remember the image to allow reverting.
     this.isActive = NotificationService.isUserOnline({
       uStatus: this.userStatus,
       uLastSeen: this.userLastSeen,
@@ -115,10 +121,10 @@ export class ProfilComponent {
 
 
   /**
-   * Weist mit einem Klick ein neues, zufälliges Profilbild über die externe
-   * API pravatar.cc zu. Ein zufälliger Seed-Parameter (?u=...) sorgt dafür,
-   * dass bei jedem Klick ein anderes Bild geladen wird und die URL pro Bild
-   * stabil bleibt. Gespeichert wird erst über "Speichern" (saveAvatarChange).
+   * Assigns a new random profile picture via the external API pravatar.cc with
+   * one click. A random seed (?u=...) makes each click load a different image
+   * while keeping the URL stable per image. The change is only persisted via
+   * "Save" (saveAvatarChange).
    */
   setRandomAvatar(): void {
     const seed = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;

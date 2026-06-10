@@ -34,6 +34,7 @@ export class ConfirmPasswordComponent implements OnInit {
   oobCode: string | null = null;
   isConfirmationVisible: boolean = false;
 
+  /** Group-level validator ensuring the password and its confirmation match. */
   static passwordMatchValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
     const newPassword = group.get('newPassword')?.value;
     const conPassword = group.get('conPassword')?.value;
@@ -52,6 +53,7 @@ export class ConfirmPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // oobCode is the one-time reset code Firebase appends to the email link.
     this.oobCode = this.route.snapshot.queryParamMap.get('oobCode');
     this.newPassword = new FormGroup({
       newPassword: new FormControl('', [Validators.required, Validators.minLength(8),]),

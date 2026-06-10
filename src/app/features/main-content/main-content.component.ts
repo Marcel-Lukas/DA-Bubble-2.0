@@ -22,6 +22,12 @@ import { NotificationService } from '../../shared/services/notification.service'
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
 })
+/**
+ * Layout shell for the authenticated app. Owns the currently active chat
+ * (private DM, channel, thread or the "new message" state), coordinates the
+ * thread panel and reacts to deletions emitted by the message area. Also
+ * starts/stops the new-message notification service for the active user.
+ */
 export class MainContentComponent {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthentificationService);
@@ -44,6 +50,7 @@ export class MainContentComponent {
     this.chatId = this.activeUserId;
     this.chatType = 'private';
 
+    // Rehydrate currentUid in case it was lost on a full page reload.
     if (this.authService.currentUid === null) this.authService.currentUid = this.activeUserId;
 
     this.notificationService.start(this.activeUserId);
@@ -65,6 +72,7 @@ export class MainContentComponent {
     this.messageIn = state;
   }
 
+  /** Opens a DM/channel chat and closes any thread panel that was open. */
   handleOpenChat(event: {
     chatType: 'private' | 'channel' | 'new';
     chatId: string | null;
@@ -76,6 +84,7 @@ export class MainContentComponent {
     this.notificationService.setActiveChat(this.chatType, this.chatId);
   }
 
+  /** Opens a thread for the given parent message alongside its chat. */
   handleOpenThread(event: {
     chatType: 'channel' | 'private';
     chatId: string;
@@ -88,9 +97,11 @@ export class MainContentComponent {
     this.notificationService.setActiveChat(this.chatType, this.chatId);
   }
 
+  /**
+   * The currently open channel was deleted -> close the chat and fall back to
+   * the user's own "empty" private state.
+   */
   handleChannelDeleted() {
-    // Der aktuell geöffnete Channel wurde gelöscht -> Chat für alle schließen
-    // und auf den eigenen "leeren" Zustand zurücksetzen.
     this.isThreadOpen = false;
     this.threadId = '';
     this.chatType = 'private';
@@ -98,9 +109,11 @@ export class MainContentComponent {
     this.notificationService.setActiveChat(this.chatType, this.chatId);
   }
 
+  /**
+   * The chat partner (e.g. a guest) no longer exists -> close the open private
+   * chat and fall back to the user's own state.
+   */
   handleChatPartnerDeleted() {
-    // Der Gesprächspartner (z.B. ein Gast) existiert nicht mehr -> offenen
-    // Privat-Chat schließen und auf den eigenen Zustand zurücksetzen.
     this.isThreadOpen = false;
     this.threadId = '';
     this.chatType = 'private';

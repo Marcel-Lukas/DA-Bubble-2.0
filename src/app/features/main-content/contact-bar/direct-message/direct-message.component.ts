@@ -16,12 +16,13 @@ import { ImageFallbackDirective } from '../../../../shared/directives/image-fall
   styleUrl: './direct-message.component.scss',
 })
 
+/** Sidebar list of users for direct messaging, with online + unread state. */
 export class DirectMessageComponent implements OnInit, OnDestroy {
   showMessages = false;
   activeUser?: User;
   activeUsers$!: Observable<any[]>;
   inactiveUsers$!: Observable<any[]>;
-  /** UIDs der Gesprächspartner mit ungelesenen Nachrichten (blinkende Markierung). */
+  /** UIDs of chat partners with unread messages (for the blinking indicator). */
   unreadChats = new Set<string>();
   @Input() activeUserId!: string | null;
   @Output() openChat = new EventEmitter<{ chatType: 'private' | 'channel'; chatId: string }>();
@@ -66,9 +67,9 @@ export class DirectMessageComponent implements OnInit, OnDestroy {
         map((users: any[]) => users.map(user => user as User))
       );
     });
-    // Verwaiste/offline Gast-Konten (leere E-Mail) ausblenden. Ein aktiver Gast
-    // (uStatus === true) bleibt für alle sichtbar, damit ihm geschrieben werden
-    // kann. Das eigene Konto ist immer sichtbar.
+    // Hide orphaned/offline guest accounts (empty email). An active guest stays
+    // visible to everyone so they can be messaged. The own account is always
+    // visible.
     const visibleUsers$ = users$.pipe(
       map(users => users.filter(user => this.isVisibleUser(user)))
     );
@@ -85,30 +86,29 @@ export class DirectMessageComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Entscheidet, ob ein Nutzer in der Direktnachrichten-Liste sichtbar ist.
-   * - Geister-/Teil-Dokumente ohne Namen (z.B. nur Presence-Felder) werden
-   *   grundsätzlich ausgeblendet.
-   * - Das eigene Konto ist immer sichtbar.
-   * - Registrierte Nutzer (mit E-Mail) sind immer sichtbar.
-   * - Gäste (leere/fehlende E-Mail) sind nur sichtbar, wenn sie aktuell online
-   *   sind, damit verwaiste Gast-Dokumente nicht auftauchen, ein aktiver Gast
-   *   aber angeschrieben werden kann.
+   * Decides whether a user is shown in the direct-message list.
+   * - Ghost/partial documents without a name (e.g. only presence fields) are
+   *   always hidden.
+   * - The own account is always visible.
+   * - Registered users (with an email) are always visible.
+   * - Guests (empty/missing email) are only visible while online, so orphaned
+   *   guest documents do not appear but an active guest can be messaged.
    */
   private isVisibleUser(user: User): boolean {
-    // Geister-Dokumente (kein Name) niemals anzeigen – auch nicht das eigene.
+    // Never show ghost documents (no name) – not even the own one.
     if (!user.uName || user.uName.trim() === '') return false;
     if (user.uId === this.activeUserId) return true;
-    // Vollwertige (registrierte) Nutzer haben eine nicht-leere E-Mail.
+    // Full (registered) users have a non-empty email.
     if (user.uEmail && user.uEmail !== '') return true;
-    // Verbleibend: Gäste (leere/fehlende E-Mail) – nur wenn online.
+    // Remaining: guests (empty/missing email) – only when online.
     return this.isOnline(user);
   }
 
   /**
-   * Bestimmt den Online-Status anhand des letzten Lebenszeichens (uLastSeen).
-   * Ein Nutzer gilt als online, wenn sein letztes Heartbeat jünger als die
-   * Presence-Schwelle ist – so wird auch ein ohne Logout geschlossener Tab
-   * nach kurzer Zeit als offline erkannt.
+   * Determines the online status from the last sign of life (uLastSeen). A user
+   * counts as online when their last heartbeat is younger than the presence
+   * threshold – so a tab closed without logout is detected as offline shortly
+   * afterwards.
    */
   isOnline(user: User): boolean {
     return NotificationService.isUserOnline(user);

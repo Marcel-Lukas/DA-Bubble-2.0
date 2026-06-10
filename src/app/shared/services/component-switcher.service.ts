@@ -8,6 +8,12 @@ import { ConfirmEmailComponent } from '../../features/access/confirm-email/confi
 import { ConfirmPasswordComponent } from '../../features/access/confirm-password/confirm-password.component';
 import { GoToEmailComponent } from '../../features/access/go-to-email/go-to-email.component';
 
+/**
+ * Drives which view is rendered inside the access (auth) screen by exposing
+ * the active component as a signal. The host template renders
+ * `currentComponent()` dynamically, so switching screens (login, sign-up,
+ * imprint, etc.) is just a signal update.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -16,6 +22,7 @@ export class ComponentSwitcherService {
 
   constructor() {}
 
+  /** Sets the active access view by key; falls back to the login screen. */
   setComponent(componentName: string): void {
     switch(componentName) {
       case 'login':

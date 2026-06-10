@@ -14,13 +14,14 @@ import { PermanentDeleteComponent } from '../../../general-components/permanent-
   styleUrl: './channels.component.scss'
 })
 
+/** Sidebar list of the channels the user belongs to, with unread indicators. */
 export class ChannelsComponent implements OnDestroy {
   showAddChannel = false;
   showChannels = false;
   isPermanentDeleteOpen = false;
   openChannelId: string | null = null;
   channels$: Observable<any[]> = of([]); 
-  /** IDs der Channels mit ungelesenen Nachrichten (für die blinkende Markierung). */
+  /** IDs of channels with unread messages (for the blinking indicator). */
   unreadChannels = new Set<string>();
   @Input() activeUserId!: any;
   @Output() openChat = new EventEmitter<{ chatType: 'private' | 'channel'; chatId: string }>();
@@ -42,6 +43,7 @@ export class ChannelsComponent implements OnDestroy {
     this.unreadSub?.unsubscribe();
   }
 
+  // On small screens, switch the layout to the message view after a selection.
   someAction() {
     const screenWidth = window.innerWidth;
     if (screenWidth < 1000) {
@@ -76,6 +78,11 @@ export class ChannelsComponent implements OnDestroy {
   }
 
 
+  /**
+   * Opens the delete confirmation for a channel. Stops propagation so the row
+   * click does not also open the channel, and switches the open chat back to
+   * the user's own private view (the channel may be gone after confirming).
+   */
   onDeleteClick(channelId: string, event: MouseEvent) {
     event.stopPropagation();
     this.openChannelId = channelId;

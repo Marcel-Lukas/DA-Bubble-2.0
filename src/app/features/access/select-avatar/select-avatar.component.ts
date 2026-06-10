@@ -36,6 +36,7 @@ export class SelectAvatarComponent {
     this.username = this.authService.registrationData?.username;
   }
 
+  /** Discards the pending registration data and returns to the sign-up form. */
   goBack(): void {
     this.authService.registrationData = null;
     this.changeComponent('signin');
@@ -60,6 +61,7 @@ export class SelectAvatarComponent {
     .catch(error => this.handleAvatarError(error));
   }
   
+  /** Shows the success indicator, then returns to the login view after 3s. */
   private handleAvatarSuccess(): void {
     this.toggleConfirmation(true);
     setTimeout(() => this.toggleConfirmation(false), 2000);

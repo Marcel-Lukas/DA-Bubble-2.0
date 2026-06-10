@@ -21,6 +21,7 @@ import { VisibleButtonService } from '../../../shared/services/visible-button.se
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
+/** Email/password, Google and anonymous-guest login form. */
 export class LoginComponent implements OnInit, OnDestroy {
   private visibleBtn = inject(VisibleButtonService);
 
@@ -70,6 +71,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     .catch(error => this.handleLoginError(error));
   }
   
+  /**
+   * Briefly shows the success indicator (2s) and then navigates to the user's
+   * home view (3s) so the confirmation animation is visible before redirect.
+   */
   private showConfirmationAndNavigate(): void {
     this.toggleConfirmation(true);
     setTimeout(() => this.toggleConfirmation(false), 2000);

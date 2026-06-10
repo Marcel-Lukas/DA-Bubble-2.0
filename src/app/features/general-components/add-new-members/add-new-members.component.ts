@@ -19,6 +19,12 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
   }
 })
 
+/**
+ * Reusable member picker used both when creating a channel and when adding
+ * members to an existing one. Provides search, selection pills (with a
+ * width-based overflow count) and the two creation modes (all users vs. a
+ * hand-picked selection).
+ */
 export class AddNewMembersComponent implements OnInit, OnChanges{
   private resizeObserver?: ResizeObserver;
   memberAddElement: boolean = false;
@@ -62,6 +68,7 @@ export class AddNewMembersComponent implements OnInit, OnChanges{
   }
 
 
+  /** Recomputes selectable users, excluding existing members and the self. */
   private async rebuildAvailableList() {
     const allUsers = await this.userService.allUsers();
     const excluded = new Set<string>();
@@ -77,6 +84,7 @@ export class AddNewMembersComponent implements OnInit, OnChanges{
 
 
   ngAfterViewInit() {
+    // Recompute how many selection pills fit whenever the input or pills resize.
     if (this.memberInput) {
       this.resizeObserver = new ResizeObserver(() => this.updateDisplayCount());
       this.resizeObserver.observe(this.memberInput.nativeElement);
@@ -104,6 +112,7 @@ export class AddNewMembersComponent implements OnInit, OnChanges{
   }
 
 
+  /** Derives how many selection pills fit into the input (clamped to 1..2). */
   private updateDisplayCount() {
     if (!this.memberInput) return;
     const containerW = this.memberInput.nativeElement.clientWidth;
@@ -199,8 +208,8 @@ export class AddNewMembersComponent implements OnInit, OnChanges{
     let ids: string[];
     if (this.selectedOption === 'option1') {
       const allUsers = await this.userService.allUsers();
-      // Gäste (leere E-Mail) werden bei "Alle Mitglieder hinzufügen" nicht
-      // mitgezählt – nur echte, registrierte Nutzer kommen in den Channel.
+      // "Add all members" excludes guests (empty email) – only real,
+      // registered users are added to the channel.
       ids = allUsers
         .filter((u) => u.uEmail !== '')
         .map((u) => u.uId)

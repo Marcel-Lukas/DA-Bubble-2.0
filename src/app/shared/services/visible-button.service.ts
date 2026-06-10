@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
+/** Shared signal controlling the visibility of a global UI button. */
 @Injectable({
   providedIn: 'root'
 })

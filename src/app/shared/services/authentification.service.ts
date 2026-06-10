@@ -28,6 +28,14 @@ import {
 } from '@angular/fire/auth';
 import { NotificationService } from './notification.service';
 
+/**
+ * Handles all authentication flows (email/password, Google, anonymous guest)
+ * and the related Firestore user-document lifecycle (creation, presence,
+ * default-channel membership and cleanup of orphaned guest/ghost docs).
+ *
+ * Firebase APIs must run inside an Angular injection context; every async
+ * block that touches Firestore/Auth is therefore wrapped in {@link runInContext}.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -36,6 +44,7 @@ export class AuthentificationService {
   private firestore: Firestore = inject(Firestore);
   private injector = inject(Injector);
 
+  /** Runs the given async block inside the Angular injection context. */
   private runInContext<T>(fn: () => Promise<T>): Promise<T> {
     return runInInjectionContext(this.injector, fn);
   }
@@ -47,19 +56,23 @@ export class AuthentificationService {
     username: string;
   } | null = null;
 
-  /** ID des Standard-Channels, dem jeder neue/eingeloggte Nutzer beitritt. */
+  /** ID of the default channel that every new/logged-in user joins. */
   private readonly defaultChannelId = '4ViNXTttFDYKlytrxQw4';
 
   /**
-   * Maximale Inaktivitätsdauer (ms) für Gast-Konten. Ein Gast, dessen letzter
-   * Heartbeat (uLastSeen) älter ist, gilt als verwaist (Tab/Browser ohne
-   * Logout geschlossen) und wird beim nächsten Login eines beliebigen Nutzers
-   * vollständig gelöscht – nicht nur als offline angezeigt.
+   * Maximum inactivity duration (ms) for guest accounts. A guest whose last
+   * heartbeat (uLastSeen) is older is considered orphaned (tab/browser closed
+   * without logout) and is fully deleted on the next login of any user –
+   * not just shown as offline.
    */
   private readonly guestInactivityMs = 5 * 60 * 1000;
 
   constructor() {}
 
+  /**
+   * Validates that the email is not already taken and stashes the registration
+   * data for the multi-step sign-up flow (avatar selection happens afterwards).
+   */
   async prepareRegistration(email: string, password: string, username: string): Promise<void | UserCredential> {
     return this.runInContext(async () => {
       const usersCollection = collection(this.firestore, 'users');
@@ -75,6 +88,10 @@ export class AuthentificationService {
     });
   }
 
+  /**
+   * Finalizes the previously prepared registration: creates the Firebase Auth
+   * user, writes the Firestore user document and joins the default channel.
+   */
   async completeRegistration(profilePictureUrl: string): Promise<UserCredential> {
     if (!this.registrationData) {
       return Promise.reject('No active registration available');
@@ -108,6 +125,7 @@ export class AuthentificationService {
     return userCredential;
   }
 
+  /** Signs in with email/password, cleans up stale docs and marks user online. */
   async loginWithEmail(email: string, password: string): Promise<void | UserCredential> {
     return this.runInContext(async () => {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
@@ -121,6 +139,7 @@ export class AuthentificationService {
     });
   }
 
+  /** Signs in via Google popup and upserts the corresponding user document. */
   async loginWithGoogle(): Promise<void | UserCredential> {
     const provider = new GoogleAuthProvider();
     return this.runInContext(async () => {
@@ -144,6 +163,11 @@ export class AuthentificationService {
     });
   }
 
+  /**
+   * Signs in anonymously as a guest. Cleans up orphaned guests, assigns the
+   * next free guest name and a stable random avatar, then joins the default
+   * channel.
+   */
   async loginAsGuest(): Promise<void | UserCredential> {
     return this.runInContext(async () => {
       const result = await signInAnonymously(this.auth);
@@ -157,9 +181,9 @@ export class AuthentificationService {
         uUserImage: this.buildGuestAvatarUrl(this.currentUid!),
         uStatus: true,
         uLastReactions: ['👍', '🙏🏻', '🔥'],
-        // Presence-Felder sofort setzen, damit ein frisch angelegter Gast nie
-        // als "verwaist" (fehlendes uLastSeen) gilt und von einem zeitgleich/
-        // direkt danach laufenden Cleanup gelöscht wird (Bug ab Gast3).
+        // Set presence fields immediately so a freshly created guest is never
+        // treated as "orphaned" (missing uLastSeen) and deleted by a cleanup
+        // running concurrently/right afterwards (bug starting at Gast3).
         uLastSeen: now,
         uLastRead: now,
       };
@@ -172,24 +196,24 @@ export class AuthentificationService {
   }
 
   /**
-   * Bereinigt verwaiste Gast- und Geister-Dokumente und ermittelt einen freien,
-   * fortlaufend nummerierten Gast-Namen (Gast, Gast2, Gast3 …).
+   * Cleans up orphaned guest and ghost documents and determines a free,
+   * sequentially numbered guest name (Gast, Gast2, Gast3 …).
    *
-   * Gelöscht werden:
-   * - Geister-Dokumente: Teil-Dokumente ohne Namen (uName fehlt/leer), die z.B.
-   *   durch einen nachlaufenden Presence-Write auf ein bereits gelöschtes Doc
-   *   entstehen konnten.
-   * - VERWAISTE Gäste (leere E-Mail), deren letzte Aktivität (uLastSeen) länger
-   *   als {@link guestInactivityMs} zurückliegt. Damit werden Gast-Konten, deren
-   *   Tab/Browser ohne Logout geschlossen wurde, vollständig entfernt statt nur
-   *   als offline angezeigt zu werden.
+   * Deleted are:
+   * - Ghost documents: partial documents without a name (uName missing/empty),
+   *   which could arise e.g. from a trailing presence write onto an already
+   *   deleted doc.
+   * - ORPHANED guests (empty email) whose last activity (uLastSeen) is older
+   *   than {@link guestInactivityMs}. This fully removes guest accounts whose
+   *   tab/browser was closed without logout, instead of just showing them as
+   *   offline.
    *
-   * Noch AKTIVE Gäste (Heartbeat jünger als die Inaktivitätsschwelle) werden
-   * NICHT gelöscht und behalten ihren Platz; der neue Gast bekommt die nächste
-   * freie Nummer. Das eigene Dokument (currentUid) wird nie gelöscht.
+   * Still ACTIVE guests (heartbeat younger than the inactivity threshold) are
+   * NOT deleted and keep their slot; the new guest gets the next free number.
+   * The own document (currentUid) is never deleted.
    *
-   * @param currentUid UID des sich gerade anmeldenden Nutzers (wird nie gelöscht).
-   * @returns Der zu vergebende Gast-Name (z.B. "Gast" oder "Gast2").
+   * @param currentUid UID of the user currently signing in (never deleted).
+   * @returns The guest name to assign (e.g. "Gast" or "Gast2").
    */
   private async cleanupOrphanedGuests(currentUid: string): Promise<string> {
     try {
@@ -220,20 +244,20 @@ export class AuthentificationService {
         return this.generateGuestName(activeGuestNames);
       });
     } catch (cleanupErr) {
-      console.warn('Bereinigung alter Gast-/Geister-Dokumente fehlgeschlagen', cleanupErr);
+      console.warn('Cleanup of old guest/ghost documents failed', cleanupErr);
       return 'Gast';
     }
   }
 
   /**
-   * Löscht verwaiste Gast-Konten (leere E-Mail), deren letzte Aktivität
-   * (uLastSeen) länger als {@link guestInactivityMs} zurückliegt. Wird bei
-   * jedem Login eines beliebigen Nutzers aufgerufen, damit sich keine alten
-   * Gast-Dokumente ansammeln – auch wenn längere Zeit kein neuer Gast einloggt.
+   * Deletes orphaned guest accounts (empty email) whose last activity
+   * (uLastSeen) is older than {@link guestInactivityMs}. Called on every login
+   * of any user so that no stale guest documents pile up – even if no new
+   * guest logs in for a longer period.
    *
-   * Aktive Gäste (Heartbeat innerhalb der Schwelle) bleiben unangetastet.
+   * Active guests (heartbeat within the threshold) are left untouched.
    *
-   * @param currentUid UID des angemeldeten Nutzers (wird nie gelöscht).
+   * @param currentUid UID of the logged-in user (never deleted).
    */
   private async cleanupInactiveGuests(currentUid: string): Promise<void> {
     try {
@@ -252,18 +276,18 @@ export class AuthentificationService {
         await Promise.all(deletions);
       });
     } catch (cleanupErr) {
-      console.warn('Bereinigung inaktiver Gast-Dokumente fehlgeschlagen', cleanupErr);
+      console.warn('Cleanup of inactive guest documents failed', cleanupErr);
     }
   }
 
   /**
-   * Prüft, ob ein Gast als verwaist gilt: Sein letzter Heartbeat (uLastSeen)
-   * liegt länger als {@link guestInactivityMs} zurück. Fehlt uLastSeen ganz
-   * (z.B. Alt-Gast vor Einführung des Heartbeats), gilt er ebenfalls als
-   * verwaist und wird gelöscht.
+   * Checks whether a guest is considered orphaned: their last heartbeat
+   * (uLastSeen) is older than {@link guestInactivityMs}. If uLastSeen is
+   * missing entirely (e.g. a legacy guest from before the heartbeat existed),
+   * the guest also counts as orphaned and is deleted.
    *
-   * @param data Teil-Daten des Gast-Dokuments.
-   * @returns true, wenn der Gast gelöscht werden soll.
+   * @param data Partial data of the guest document.
+   * @returns true if the guest should be deleted.
    */
   private isGuestExpired(data: Partial<UserInterface>): boolean {
     const lastSeen = (data as { uLastSeen?: unknown }).uLastSeen;
@@ -273,8 +297,8 @@ export class AuthentificationService {
   }
 
   /**
-   * Normalisiert einen Firestore-Timestamp (oder kompatiblen Wert) in
-   * Millisekunden. Gibt null zurück, wenn der Wert kein Zeitpunkt ist.
+   * Normalizes a Firestore Timestamp (or compatible value) into milliseconds.
+   * Returns null when the value is not a point in time.
    */
   private toMillis(value: unknown): number | null {
     if (value instanceof Date) return value.getTime();
@@ -297,11 +321,11 @@ export class AuthentificationService {
   }
 
   /**
-   * Entfernt ausschließlich Geister-Dokumente (Teil-Dokumente ohne Namen).
-   * Wird bei jedem Login aufgerufen, damit verwaiste Presence-only-Docs nicht
-   * in den Listen auftauchen. Gast-Nummerierung ist hier irrelevant.
+   * Removes only ghost documents (partial documents without a name). Called on
+   * every login so that orphaned presence-only docs do not show up in the
+   * lists. Guest numbering is irrelevant here.
    *
-   * @param currentUid UID des angemeldeten Nutzers (wird nie gelöscht).
+   * @param currentUid UID of the logged-in user (never deleted).
    */
   private async cleanupGhostUsers(currentUid: string): Promise<void> {
     try {
@@ -318,17 +342,17 @@ export class AuthentificationService {
         await Promise.all(deletions);
       });
     } catch (cleanupErr) {
-      console.warn('Bereinigung der Geister-Dokumente fehlgeschlagen', cleanupErr);
+      console.warn('Cleanup of ghost documents failed', cleanupErr);
     }
   }
 
   /**
-   * Ermittelt den nächsten freien Gast-Namen anhand der bereits vergebenen
-   * (aktiven) Gast-Namen. Der erste Gast heißt "Gast", danach "Gast2",
-   * "Gast3" usw. – es wird stets die kleinste freie Nummer gewählt.
+   * Determines the next free guest name based on the already taken (active)
+   * guest names. The first guest is named "Gast", then "Gast2", "Gast3" etc. –
+   * always picking the smallest free number.
    *
-   * @param takenNames Namen der aktuell aktiven Gäste.
-   * @returns Der nächste freie Gast-Name.
+   * @param takenNames Names of the currently active guests.
+   * @returns The next free guest name.
    */
   private generateGuestName(takenNames: string[]): string {
     const taken = new Set(takenNames);
@@ -339,21 +363,21 @@ export class AuthentificationService {
   }
 
   /**
-   * Baut eine zufällige, aber pro Gast stabile Avatar-URL über pravatar.cc.
-   * Die UID dient als Seed (?u=<uid>), damit jeder Gast ein eigenes Bild
-   * erhält und es über Reloads/Re-Renders hinweg gleich bleibt.
+   * Builds a random but per-guest stable avatar URL via pravatar.cc. The UID
+   * serves as the seed (?u=<uid>) so each guest gets its own image that stays
+   * the same across reloads/re-renders.
    *
-   * @param uid UID des Gasts (Seed für das Bild).
-   * @returns Vollständige Bild-URL.
+   * @param uid UID of the guest (seed for the image).
+   * @returns Full image URL.
    */
   private buildGuestAvatarUrl(uid: string): string {
     return `https://i.pravatar.cc/300?u=${encodeURIComponent(uid)}`;
   }
 
   /**
-   * Fügt den Nutzer dem Standard-Channel hinzu. Schlägt fehlertolerant fehl:
-   * Wenn der Channel nicht existiert (z.B. versehentlich gelöscht), wird er
-   * neu angelegt, statt den gesamten Login abzubrechen.
+   * Adds the user to the default channel. Fails gracefully: if the channel
+   * does not exist (e.g. accidentally deleted), it is recreated instead of
+   * aborting the entire login.
    */
   private async addUserToDefaultChannel(uid: string): Promise<void> {
     try {
@@ -366,7 +390,7 @@ export class AuthentificationService {
         } else {
           await setDoc(channelRef, {
             cName: 'Allgemein',
-            cDescription: 'Standard-Channel für alle Mitglieder.',
+            cDescription: 'Default channel for all members.',
             cCreatedByUser: uid,
             cUserIds: [uid],
             cTime: serverTimestamp(),
@@ -374,10 +398,11 @@ export class AuthentificationService {
         }
       });
     } catch (channelErr) {
-      console.warn('Beitritt zum Standard-Channel fehlgeschlagen (Login wird fortgesetzt)', channelErr);
+      console.warn('Joining the default channel failed (login continues)', channelErr);
     }
   }
 
+  /** Sends a password reset email, but only if the address belongs to a user. */
   async sendResetPasswordEmail(email: string): Promise<void> {
     const querySnapshot = await this.runInContext(async () => {
       const usersCollection = collection(this.firestore, 'users');
@@ -388,10 +413,15 @@ export class AuthentificationService {
     return sendPasswordResetEmail(this.auth, email);
   }
 
+  /** Completes a password reset using the out-of-band code from the email. */
   async confirmResetPassword(oobCode: string, newPassword: string): Promise<void> {
     return confirmPasswordReset(this.auth, oobCode, newPassword);
   }
 
+  /**
+   * Logs the user out. Anonymous guests are removed entirely, registered users
+   * are marked offline, then the Firebase session is signed out.
+   */
   async logout(): Promise<void> {
     const uid = this.currentUid;
     const user = this.auth.currentUser;
@@ -410,7 +440,7 @@ export class AuthentificationService {
         });
         await user.delete();
       } catch (deleteErr) {
-        console.warn('Gast-Löschen fehlgeschlagen, weiter mit Sign-Out', deleteErr);
+        console.warn('Guest deletion failed, continuing with sign-out', deleteErr);
       }
     }
   }
@@ -424,7 +454,7 @@ export class AuthentificationService {
         await updateDoc(userDoc, { uStatus: false });
       });
     } catch (err) {
-      console.warn('Status-Update fehlgeschlagen (Dokument evtl. gelöscht)', err);
+      console.warn('Status update failed (document possibly deleted)', err);
     }
   }
 

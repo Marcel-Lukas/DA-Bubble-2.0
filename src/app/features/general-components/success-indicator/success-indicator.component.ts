@@ -29,6 +29,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
     ])
   ]
 })
+/** Small toast-like indicator that slides in from the right when `visible`. */
 export class SuccessIndicatorComponent {
   @Input() visible: boolean = false;
 }
