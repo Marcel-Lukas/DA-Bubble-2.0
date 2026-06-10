@@ -35,11 +35,6 @@ export class NotificationService {
   private activeChatId: string | null = null;
   /** UID of the currently logged-in user. */
   private activeUserId: string | null = null;
-  /**
-   * True if the active user is a guest account (anonymous, empty uEmail).
-   * Guests are excluded from persisting uLastSeen.
-   */
-  private isGuest = false;
   /** Channel IDs the user is a member of (for relevant notifications). */
   private memberChannelIds = new Set<string>();
 
@@ -98,7 +93,6 @@ export class NotificationService {
     if (!activeUserId) return;
     this.activeUserId = activeUserId;
     this.readyToPersist = false;
-    this.isGuest = await this.checkIsGuest(activeUserId);
     this.startTime = await this.loadLastRead(activeUserId);
     this.listenForChannels();
     this.listenForMessages();
@@ -121,23 +115,7 @@ export class NotificationService {
     this.memberChannelIds.clear();
     this.unreadSubject.next(new Set());
     this.activeUserId = null;
-    this.isGuest = false;
     this.readyToPersist = false;
-  }
-
-  /**
-   * Checks whether the given user is a guest account. Guests are anonymous
-   * users with an empty uEmail and should be excluded from persisting
-   * uLastSeen.
-   */
-  private async checkIsGuest(uid: string): Promise<boolean> {
-    try {
-      const ref = doc(this.firestore, 'users', uid);
-      const snap = await getDoc(ref);
-      return snap.data()?.['uEmail'] === '';
-    } catch {
-      return false;
-    }
   }
 
   /**
@@ -166,13 +144,14 @@ export class NotificationService {
    * "missed messages" protection is handled separately via the startTime
    * marker, not by withholding the heartbeat.
    *
-   * Guest accounts are excluded so that orphaned guest docs are not kept
-   * alive by a heartbeat.
+   * Guests DO write the heartbeat as well: it makes guest inactivity
+   * measurable so that an abandoned guest doc (tab/browser closed without
+   * logout) can be deleted after the inactivity timeout (handled in the
+   * AuthentificationService) instead of lingering as a permanently "offline"
+   * orphan.
    */
   private persistLastSeen(): void {
     if (!this.activeUserId) return;
-    // Guest accounts are excluded from persisting uLastSeen.
-    if (this.isGuest) return;
     if (!this.readyToPersist) return;
     const uid = this.activeUserId;
     runInInjectionContext(this.injector, () => {
@@ -196,7 +175,6 @@ export class NotificationService {
    */
   private persistLastRead(): void {
     if (!this.activeUserId) return;
-    if (this.isGuest) return;
     if (!this.readyToPersist) return;
     if (this.unreadSubject.value.size > 0) return;
     const uid = this.activeUserId;

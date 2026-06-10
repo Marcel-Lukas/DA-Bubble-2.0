@@ -11,6 +11,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
@@ -48,6 +49,14 @@ export class AuthentificationService {
 
   /** ID des Standard-Channels, dem jeder neue/eingeloggte Nutzer beitritt. */
   private readonly defaultChannelId = '4ViNXTttFDYKlytrxQw4';
+
+  /**
+   * Maximale Inaktivitätsdauer (ms) für Gast-Konten. Ein Gast, dessen letzter
+   * Heartbeat (uLastSeen) älter ist, gilt als verwaist (Tab/Browser ohne
+   * Logout geschlossen) und wird beim nächsten Login eines beliebigen Nutzers
+   * vollständig gelöscht – nicht nur als offline angezeigt.
+   */
+  private readonly guestInactivityMs = 5 * 60 * 1000;
 
   constructor() {}
 
@@ -104,6 +113,7 @@ export class AuthentificationService {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
       this.currentUid = result.user.uid;
       await this.cleanupGhostUsers(this.currentUid!);
+      await this.cleanupInactiveGuests(this.currentUid!);
       const userRef = collection(this.firestore, 'users');
       const userDocRef = doc(userRef, this.currentUid!);
       await updateDoc(userDocRef, { uStatus: true });
@@ -117,6 +127,7 @@ export class AuthentificationService {
       const result = await signInWithPopup(this.auth, provider);
       this.currentUid = result.user.uid;
       await this.cleanupGhostUsers(this.currentUid!);
+      await this.cleanupInactiveGuests(this.currentUid!);
       const userData: UserInterface = {
         uId: this.currentUid!,
         uName: result.user.displayName || '',
@@ -138,6 +149,7 @@ export class AuthentificationService {
       const result = await signInAnonymously(this.auth);
       this.currentUid = result.user.uid;
       const guestName = await this.cleanupOrphanedGuests(this.currentUid!);
+      const now = Timestamp.now();
       const guestData: UserInterface = {
         uId: this.currentUid!,
         uName: guestName,
@@ -145,6 +157,11 @@ export class AuthentificationService {
         uUserImage: this.buildGuestAvatarUrl(this.currentUid!),
         uStatus: true,
         uLastReactions: ['👍', '🙏🏻', '🔥'],
+        // Presence-Felder sofort setzen, damit ein frisch angelegter Gast nie
+        // als "verwaist" (fehlendes uLastSeen) gilt und von einem zeitgleich/
+        // direkt danach laufenden Cleanup gelöscht wird (Bug ab Gast3).
+        uLastSeen: now,
+        uLastRead: now,
       };
       const userRef = collection(this.firestore, 'users');
       const userDocRef = doc(userRef, this.currentUid!);
@@ -162,11 +179,14 @@ export class AuthentificationService {
    * - Geister-Dokumente: Teil-Dokumente ohne Namen (uName fehlt/leer), die z.B.
    *   durch einen nachlaufenden Presence-Write auf ein bereits gelöschtes Doc
    *   entstehen konnten.
-   * - OFFLINE/verwaiste Gäste (leere E-Mail, kein aktueller Heartbeat).
+   * - VERWAISTE Gäste (leere E-Mail), deren letzte Aktivität (uLastSeen) länger
+   *   als {@link guestInactivityMs} zurückliegt. Damit werden Gast-Konten, deren
+   *   Tab/Browser ohne Logout geschlossen wurde, vollständig entfernt statt nur
+   *   als offline angezeigt zu werden.
    *
-   * Gleichzeitig AKTIVE Gäste werden NICHT gelöscht und behalten ihren Platz;
-   * der neue Gast bekommt die nächste freie Nummer. Das eigene Dokument
-   * (currentUid) wird nie gelöscht.
+   * Noch AKTIVE Gäste (Heartbeat jünger als die Inaktivitätsschwelle) werden
+   * NICHT gelöscht und behalten ihren Platz; der neue Gast bekommt die nächste
+   * freie Nummer. Das eigene Dokument (currentUid) wird nie gelöscht.
    *
    * @param currentUid UID des sich gerade anmeldenden Nutzers (wird nie gelöscht).
    * @returns Der zu vergebende Gast-Name (z.B. "Gast" oder "Gast2").
@@ -189,7 +209,7 @@ export class AuthentificationService {
 
           if (isGhost) {
             deletions.push(deleteDoc(doc(usersCollection, docSnap.id)));
-          } else if (isGuest && !NotificationService.isUserOnline(data)) {
+          } else if (isGuest && this.isGuestExpired(data)) {
             deletions.push(deleteDoc(doc(usersCollection, docSnap.id)));
           } else if (isGuest) {
             activeGuestNames.push(name);
@@ -203,6 +223,77 @@ export class AuthentificationService {
       console.warn('Bereinigung alter Gast-/Geister-Dokumente fehlgeschlagen', cleanupErr);
       return 'Gast';
     }
+  }
+
+  /**
+   * Löscht verwaiste Gast-Konten (leere E-Mail), deren letzte Aktivität
+   * (uLastSeen) länger als {@link guestInactivityMs} zurückliegt. Wird bei
+   * jedem Login eines beliebigen Nutzers aufgerufen, damit sich keine alten
+   * Gast-Dokumente ansammeln – auch wenn längere Zeit kein neuer Gast einloggt.
+   *
+   * Aktive Gäste (Heartbeat innerhalb der Schwelle) bleiben unangetastet.
+   *
+   * @param currentUid UID des angemeldeten Nutzers (wird nie gelöscht).
+   */
+  private async cleanupInactiveGuests(currentUid: string): Promise<void> {
+    try {
+      await this.runInContext(async () => {
+        const usersCollection = collection(this.firestore, 'users');
+        const snapshot = await getDocs(usersCollection);
+        const deletions = snapshot.docs
+          .filter((docSnap) => docSnap.id !== currentUid)
+          .filter((docSnap) => {
+            const data = docSnap.data() as Partial<UserInterface>;
+            const isGuest = (data.uEmail ?? '') === '';
+            const hasName = (data.uName ?? '').trim() !== '';
+            return isGuest && hasName && this.isGuestExpired(data);
+          })
+          .map((docSnap) => deleteDoc(doc(usersCollection, docSnap.id)));
+        await Promise.all(deletions);
+      });
+    } catch (cleanupErr) {
+      console.warn('Bereinigung inaktiver Gast-Dokumente fehlgeschlagen', cleanupErr);
+    }
+  }
+
+  /**
+   * Prüft, ob ein Gast als verwaist gilt: Sein letzter Heartbeat (uLastSeen)
+   * liegt länger als {@link guestInactivityMs} zurück. Fehlt uLastSeen ganz
+   * (z.B. Alt-Gast vor Einführung des Heartbeats), gilt er ebenfalls als
+   * verwaist und wird gelöscht.
+   *
+   * @param data Teil-Daten des Gast-Dokuments.
+   * @returns true, wenn der Gast gelöscht werden soll.
+   */
+  private isGuestExpired(data: Partial<UserInterface>): boolean {
+    const lastSeen = (data as { uLastSeen?: unknown }).uLastSeen;
+    const lastSeenMs = this.toMillis(lastSeen);
+    if (lastSeenMs === null) return true;
+    return Date.now() - lastSeenMs > this.guestInactivityMs;
+  }
+
+  /**
+   * Normalisiert einen Firestore-Timestamp (oder kompatiblen Wert) in
+   * Millisekunden. Gibt null zurück, wenn der Wert kein Zeitpunkt ist.
+   */
+  private toMillis(value: unknown): number | null {
+    if (value instanceof Date) return value.getTime();
+    if (typeof value === 'number') return value;
+    if (
+      value &&
+      typeof value === 'object' &&
+      typeof (value as { toMillis?: unknown }).toMillis === 'function'
+    ) {
+      return (value as { toMillis: () => number }).toMillis();
+    }
+    if (
+      value &&
+      typeof value === 'object' &&
+      typeof (value as { seconds?: unknown }).seconds === 'number'
+    ) {
+      return (value as { seconds: number }).seconds * 1000;
+    }
+    return null;
   }
 
   /**

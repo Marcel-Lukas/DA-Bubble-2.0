@@ -7,6 +7,8 @@ export interface UserInterface {
   uLastReactions: string[];
     /** Time of the last heartbeat for presence detection. */
   uLastSeen?: unknown;
+    /** Time up to which the user has read all messages. */
+  uLastRead?: unknown;
 }
 
 export interface User {
@@ -18,6 +20,8 @@ export interface User {
     uLastReactions: string[];
     /** Time of the last heartbeat for presence detection. */
     uLastSeen?: unknown;
+    /** Time up to which the user has read all messages. */
+    uLastRead?: unknown;
 }
 
 
