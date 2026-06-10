@@ -24,6 +24,9 @@ export class DirectMessageComponent implements OnInit, OnDestroy {
   inactiveUsers$!: Observable<any[]>;
   /** UIDs of chat partners with unread messages (for the blinking indicator). */
   unreadChats = new Set<string>();
+  /** Timestamp (ms) at which a user was first observed as online, keyed by uId.
+   *  Used to put users who just came online at the very top of the list. */
+  private onlineSince = new Map<string, number>();
   @Input() activeUserId!: string | null;
   @Output() openChat = new EventEmitter<{ chatType: 'private' | 'channel'; chatId: string }>();
   @Output() toggleMessage = new EventEmitter<boolean>();
@@ -77,13 +80,45 @@ export class DirectMessageComponent implements OnInit, OnDestroy {
       map(users => users.filter(user => user.uId === this.activeUserId))
     );
     this.inactiveUsers$ = visibleUsers$.pipe(
-      map(users => users.filter(user => user.uId !== this.activeUserId))
+      map(users => users.filter(user => user.uId !== this.activeUserId)),
+      map(users => this.sortByOnlineStatus(users))
     );
     visibleUsers$.subscribe(users => {
       this.activeUser = users.find(user => user.uId === this.activeUserId);
     });
   }
 
+
+  /**
+   * Sorts the user list so that online users appear at the top, while offline
+   * users are listed afterwards. Among online users, those who came online most
+   * recently are shown first (newly online users move to the very top).
+   */
+  private sortByOnlineStatus(users: User[]): User[] {
+    const now = Date.now();
+    for (const user of users) {
+      const uid = user.uId;
+      if (!uid) continue;
+      if (this.isOnline(user)) {
+        if (!this.onlineSince.has(uid)) {
+          this.onlineSince.set(uid, now);
+        }
+      } else {
+        this.onlineSince.delete(uid);
+      }
+    }
+    return [...users].sort((a, b) => {
+      const aOnline = this.isOnline(a);
+      const bOnline = this.isOnline(b);
+      if (aOnline !== bOnline) return aOnline ? -1 : 1;
+      if (aOnline && bOnline) {
+        // Both online: most recently online first.
+        return (this.onlineSince.get(b.uId ?? '') ?? 0) - (this.onlineSince.get(a.uId ?? '') ?? 0);
+      }
+      // Both offline: keep a stable alphabetical order.
+      return (a.uName ?? '').localeCompare(b.uName ?? '');
+    });
+  }
 
   /**
    * Decides whether a user is shown in the direct-message list.
