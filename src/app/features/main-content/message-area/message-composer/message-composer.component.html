@@ -20,10 +20,18 @@
 </div>
 }
 
+@if (isRateLimited) {
+<div class="rate-limit-hint">
+  <span class="material-symbols">schedule</span>
+  <span class="hint">Spamschutz – du sendest zu schnell</span>
+</div>
+}
+
 <textarea
   type="text"
   [placeholder]="getPlaceholder()"
   [(ngModel)]="newMessageText"
+  [class.rate-limited]="isRateLimited"
   #messageInput
   (input)="onTextChange($event)"
   (keydown)="handleKeyDown($event)"

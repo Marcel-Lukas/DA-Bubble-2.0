@@ -5,6 +5,7 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnDestroy,
   Output,
   ViewChild,
   inject,
@@ -32,7 +33,7 @@ import { ImageFallbackDirective } from '../../../../shared/directives/image-fall
   templateUrl: './message-composer.component.html',
   styleUrls: ['./message-composer.component.scss'],
 })
-export class MessageComposerComponent {
+export class MessageComposerComponent implements OnDestroy {
   @Input() placeholder = 'Nachricht schreiben …';
 
   @Output() messageSend = new EventEmitter<string>();
@@ -50,11 +51,23 @@ export class MessageComposerComponent {
 
   newMessageText = '';
 
+  /** Mindestabstand zwischen zwei Nachrichten in Millisekunden (Spamschutz). */
+  private readonly sendCooldownMs = 1555;
+  /** Zeitstempel der zuletzt gesendeten Nachricht. */
+  private lastSentAt = 0;
+  /** Steuert die kurze visuelle Rückmeldung bei zu schnellem Senden. */
+  isRateLimited = false;
+  private rateLimitTimeout?: ReturnType<typeof setTimeout>;
+
   private userService = inject(UserService);
   private channelService = inject(ChannelService);
 
   focus(): void {
     setTimeout(() => this.messageInputRef?.nativeElement.focus());
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.rateLimitTimeout);
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -211,9 +224,32 @@ export class MessageComposerComponent {
   sendMessage() {
     const trimmed = this.newMessageText.trim();
     if (!trimmed) return;
+
+    // Spamschutz: Nachricht blockieren, wenn der Cooldown noch nicht abgelaufen
+    // ist. Gilt gleichermaßen für registrierte User und Gäste.
+    const now = Date.now();
+    if (now - this.lastSentAt < this.sendCooldownMs) {
+      this.triggerRateLimitFeedback();
+      return;
+    }
+
+    this.lastSentAt = now;
     this.messageSend.emit(trimmed);
     this.newMessageText = '';
     this.hideSuggestions();
+  }
+
+  /**
+   * Zeigt eine kurze visuelle Rückmeldung, dass zu schnell gesendet wurde.
+   * Der Hinweis verschwindet automatisch nach kurzer Zeit wieder.
+   */
+  private triggerRateLimitFeedback() {
+    this.isRateLimited = true;
+    clearTimeout(this.rateLimitTimeout);
+    this.rateLimitTimeout = setTimeout(
+      () => (this.isRateLimited = false),
+      this.sendCooldownMs
+    );
   }
 
   getPlaceholder(): string {

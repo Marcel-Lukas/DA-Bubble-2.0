@@ -46,6 +46,51 @@ emoji-mart {
   }
 }
 
+.rate-limit-hint {
+  @include flexBox(row, initial, center, 4);
+  margin-bottom: 4px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  color: #d14343;
+  background-color: #ffecec;
+  animation: rateLimitFade 111ms ease-in;
+  .material-symbols {
+    font-size: 18px;
+  }
+  .hint {
+    font-size: 16px;
+  }
+}
+
+textarea.rate-limited {
+  border-color: #d14343 !important;
+  animation: rateLimitShake 0.3s ease-in-out;
+}
+
+@keyframes rateLimitFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rateLimitShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
 .textfield-buttons {
   @include flexBox(row, space-between, center, 0);
   div {
