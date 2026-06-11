@@ -37,6 +37,8 @@ export class ProfilComponent {
   showAvatarChoice = false;
   editedUserName: string = '';
   items = [1, 2, 3, 4, 5, 6];
+  /** True if the viewer is a guest */
+  viewerIsGuest: boolean = false;
 
   @Input() showButton: boolean = false;
   @Input() userName: any;
@@ -61,6 +63,29 @@ export class ProfilComponent {
       uLastSeen: this.userLastSeen,
     });
     this.originalUserImage = this.userImage;
+    this.resolveViewerIsGuest();
+  }
+
+
+  /**
+   * Determines whether the viewer (the currently logged-in user identified by
+   * activeUserId) is a guest. Guests are recognized by an empty email and must
+   * not be able to see other users' email addresses.
+   */
+  private async resolveViewerIsGuest(): Promise<void> {
+    if (!this.activeUserId) return;
+    try {
+      const viewer = await this.userService.getUser(this.activeUserId);
+      this.viewerIsGuest = (viewer.uEmail ?? '') === '';
+    } catch {
+      this.viewerIsGuest = false;
+    }
+  }
+
+
+  /** Email is only visible when the viewer is a registered user (not a guest). */
+  get canViewEmail(): boolean {
+    return !this.viewerIsGuest;
   }
 
   closeProfil() {
