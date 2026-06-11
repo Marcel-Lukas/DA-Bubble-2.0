@@ -60,13 +60,21 @@
             </div>
         }
         @else {
-            @if (showEditProfil && userEmail !== '') {
+            @if (showEditProfil && canEditName) {
                 <div class="editInput">
                     <div class="editAccountText">
                         <img src="assets/icons/account_circle.svg">
                         <h2>Vollständiger Name</h2>
                     </div>
-                    <input [(ngModel)]="editedUserName" [placeholder]="userName" type="text">
+                    @if (isOwnGuestProfile) {
+                        <div class="guestNameInput">
+                            <span class="guestPrefix">Gast-</span>
+                            <input [(ngModel)]="editedUserName" placeholder="Name" type="text">
+                        </div>
+                    }
+                    @else {
+                        <input [(ngModel)]="editedUserName" [placeholder]="userName" type="text">
+                    }
                 </div>
             }
         }

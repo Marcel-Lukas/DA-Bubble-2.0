@@ -31,6 +31,9 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
 export class ProfilComponent {
   private originalUserImage!: string;
   
+  /** Prefix that is kept in front of a guest's chosen display name. */
+  static readonly GUEST_PREFIX = 'Gast-';
+
   firestore = inject(Firestore);
   isActive: boolean = true;
   showEditProfil: boolean = false;
@@ -88,6 +91,16 @@ export class ProfilComponent {
     return !this.viewerIsGuest;
   }
 
+  /** True when the profile being edited is the viewer's own guest profile. */
+  get isOwnGuestProfile(): boolean {
+    return this.viewerIsGuest && this.activeUserId === this.userId;
+  }
+
+  /** True when the name edit field should be shown (registered user or guest, own profile). */
+  get canEditName(): boolean {
+    return this.userEmail !== '' || this.isOwnGuestProfile;
+  }
+
   closeProfil() {
     this.showAvatarChoice = false;
     this.close.emit();
@@ -106,13 +119,27 @@ export class ProfilComponent {
 
   changeUserName() {
     if (!this.activeUserId || !this.editedUserName.trim()) return;
+    const newName = this.buildNameToStore(this.editedUserName.trim());
     const userRef = doc(this.firestore, 'users', this.activeUserId);
     updateDoc(userRef, {
-      uName: this.editedUserName.trim(),
+      uName: newName,
     }).then(() => {
-      this.userName = this.editedUserName;
+      this.userName = newName;
       this.showEditProfil = false;
     });
+  }
+
+
+  /**
+   * Builds the name to persist. For guests editing their own profile, the
+   * fixed "#Gast-" prefix is prepended (e.g. "#Gast-Max Mustermann") so it stays
+   * visible to everyone. Registered users keep their plain name.
+   */
+  private buildNameToStore(name: string): string {
+    if (this.isOwnGuestProfile) {
+      return `${ProfilComponent.GUEST_PREFIX}${name}`;
+    }
+    return name;
   }
 
 
@@ -128,6 +155,12 @@ export class ProfilComponent {
 
   onEditClick() {
     this.showEditProfil = true;
+    // For guests, prefill the input with the editable part only (without prefix).
+    if (this.isOwnGuestProfile && typeof this.userName === 'string') {
+      this.editedUserName = this.userName.startsWith(ProfilComponent.GUEST_PREFIX)
+        ? this.userName.slice(ProfilComponent.GUEST_PREFIX.length)
+        : '';
+    }
   }
 
 
@@ -146,14 +179,14 @@ export class ProfilComponent {
 
 
   /**
-   * Assigns a new random profile picture via the external API pravatar.cc with
-   * one click. A random seed (?u=...) makes each click load a different image
-   * while keeping the URL stable per image. The change is only persisted via
-   * "Save" (saveAvatarChange).
-   */
+    * Assigns a new random profile picture via the external 
+    * API pravatar.cc with one click. pravatar.cc serves 
+    * images 1..70 (?img=1 .. ?img=70), so a random number 
+    * from that range is used.
+    */
   setRandomAvatar(): void {
-    const seed = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
-    this.userImage = `https://i.pravatar.cc/300?u=${seed}`;
+    const img = Math.floor(Math.random() * 70) + 1;
+    this.userImage = `https://i.pravatar.cc/300?img=${img}`;
     this.showAvatarChoice = false;
   }
 
