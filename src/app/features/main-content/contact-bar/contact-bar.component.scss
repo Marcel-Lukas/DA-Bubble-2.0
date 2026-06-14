@@ -1,48 +1,31 @@
 @use "../../../shared/scss/global" as *;
 
 main {
-  @include flexBox(column, initial, initial, 25);
+  @include flexBox(column, initial, initial, 20);
   width: 390px;
   height: 100%;
   min-height: 0;
   padding: 0 10px 30px 16px;
   background-color: $white;
   border-radius: 20px;
-  border: solid 2px oklch(from #{$main2} calc(l + 0.14) calc(c - 0.07) h); 
-  // overflow: hidden;
+  overflow: hidden;
 }
 
 section {
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto; 
-  @include flexBox(column, initial, initial, 10);
+  @include flexBox(column, initial, initial, 20);
 }
 
 section::-webkit-scrollbar-track {
-  // margin-top: 40px;
-  // margin-bottom: 40px;
   background: $main1;
 }
 
 section::-webkit-scrollbar {
-  width: 6px;
-  height: 0;
+  width: 8px;
+  height: 0 !important;
 }
-
-section::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.5);
-  background: $scrollbar;
-  border-radius: 8px;
-}
-
-/* Mozilla */
-section {
-    scrollbar-color: $scrollbar $main1;
-    scrollbar-width: auto;
-}
-
-
 
 
 @media (max-width: 1000px) {
