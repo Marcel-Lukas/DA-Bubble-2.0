@@ -8,9 +8,14 @@
 
 emoji-mart {
   position: absolute;
-  bottom: 132px;
-  left: 20px;
+  bottom: 130px;
+  left: 0;
+  border-radius: 12px;
+  overflow: hidden;
   z-index: 99;
+  max-height: 357px;
+  box-shadow: 0px 0px 14px 6px oklch(from #{$main2} calc(l + 0.14) calc(c - 0.07) h);
+  border: solid 1px $main2;
 }
 
 .suggestions {
@@ -21,6 +26,8 @@ emoji-mart {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  box-shadow: 0px 0px 14px 6px oklch(from #{$main2} calc(l + 0.14) calc(c - 0.07) h);
+  border: solid 1px $main2;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -126,5 +133,14 @@ textarea.rate-limited {
   color: $grey;
   &:hover {
     color: $accent;
+  }
+}
+
+
+@media (max-width: 400px) {
+  emoji-mart {
+    bottom: 120px;
+    left: -20px;
+    width: 304px;
   }
 }

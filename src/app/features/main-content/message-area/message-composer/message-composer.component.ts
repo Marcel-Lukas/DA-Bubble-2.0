@@ -218,7 +218,6 @@ export class MessageComposerComponent implements OnDestroy {
     ta.value = this.newMessageText;
     ta.setSelectionRange(pos + char.length, pos + char.length);
     ta.focus();
-    this.isEmojiPickerOpen = false;
   }
 
   /** Closes the emoji picker when clicking outside it and its toggle button. */

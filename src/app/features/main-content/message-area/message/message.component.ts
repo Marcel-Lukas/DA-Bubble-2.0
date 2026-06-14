@@ -483,6 +483,7 @@ export class MessageComponent implements OnInit {
 
   openEdit() {
     this.editText = this.message.mText ?? '';
+    this.isEmojiPickerOpen = false;
     this.toggleEdit();
     setTimeout(() => this.editTextareaRef?.nativeElement.focus());
   }
@@ -509,6 +510,7 @@ export class MessageComponent implements OnInit {
   private closeEdit() {
     this.isEditOpen = false;
     this.isOptionsOpen = false;
+    this.isEmojiPickerOpen = false;
     this.cdr.markForCheck();
   }
 

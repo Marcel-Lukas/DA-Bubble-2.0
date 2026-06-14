@@ -64,7 +64,12 @@ section {
   background-color: $white;
   border: 1px solid $main1;
   border-radius: 20px;
-  @include flexBox(column, initial, initial, 16);
+  @include flexBox(column, initial, initial, 2);
+
+  textarea {
+    height: 160px;
+    border-radius: 0 0 0 8px;
+  }
 
   > div {
     width: 100%;
@@ -272,13 +277,14 @@ section {
 
 emoji-mart {
   position: absolute;
-  left: 0;
-  top: 48px;
-  display: flex;
+  left: 134px;
+  top: 248px;
   border-radius: 12px;
   overflow: hidden;
-  max-height: 357px;
   z-index: 99;
+  max-height: 357px;
+  box-shadow: 0px 0px 14px 6px oklch(from #{$main2} calc(l + 0.14) calc(c - 0.07) h);
+  border: solid 1px $main2;
 }
 
 
@@ -334,15 +340,40 @@ emoji-mart {
   }
 }
 
+
+@media (max-width: 660px) {
+  emoji-mart {
+    left: 80px;
+  }
+}
+
+@media (max-width: 560px) {
+  emoji-mart {
+    left: 40px;
+  }
+}
+
+@media (max-width: 500px) {
+  emoji-mart {
+    left: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  emoji-mart {
+    left: 0;
+    max-width: 302px;
+  }
+}
+
+
+
 @media (max-width: 510px) {
   .message-actions {
     position: absolute;
     right: unset !important;
     left: 8px !important;
     top: 68px;
-    max-width: 280px;
-  }
-  emoji-mart {
     max-width: 280px;
   }
   .row-reverse {

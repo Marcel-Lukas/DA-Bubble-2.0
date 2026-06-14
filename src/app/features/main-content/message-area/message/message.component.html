@@ -6,7 +6,7 @@
   <div class="edit-message">
     <textarea #editTextarea type="text" [(ngModel)]="editText"></textarea>
     <div>
-      <button class="icon-button blue-hover" (click)="toggleEmojiPicker($event)">
+      <button #emojiBtn class="icon-button blue-hover" (click)="toggleEmojiPicker($event)">
         <div class="material-symbols textfield-icon">sentiment_satisfied</div>
       </button>
       <div>
@@ -16,6 +16,14 @@
         </button>
       </div>
     </div>
+
+    @defer (when isEmojiPickerOpen) {
+      @if (isEmojiPickerOpen) {
+      <emoji-mart #emojiPicker (emojiClick)="onEmojiPicked($event)"
+        [class.active-user-emoji]="message.mSenderId === activeUserId"
+        [class.thread-emoji]="chatType === 'thread'"></emoji-mart>
+      }
+    }
   </div>
   } @else {
   <div class="message" [class.user-message]="message.mSenderId === activeUserId">
