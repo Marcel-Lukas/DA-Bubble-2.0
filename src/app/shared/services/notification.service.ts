@@ -46,14 +46,14 @@ export class NotificationService {
   private startTime = Timestamp.now();
 
   /** Interval (ms) at which uLastSeen is updated (heartbeat). */
-  private readonly heartbeatMs = 10000;
+  private readonly heartbeatMs = 15000;
   /**
    * Time window (ms) within which a user counts as "online" based on their
    * last heartbeat (uLastSeen). If the last heartbeat is older than this,
    * the user is treated as offline – even if uStatus is still true (e.g.
    * when the browser tab was closed without an explicit logout).
    */
-  static readonly ONLINE_THRESHOLD_MS = 25000;
+  static readonly ONLINE_THRESHOLD_MS = 40000;
   /** Handle of the heartbeat interval. */
   private heartbeatTimer?: ReturnType<typeof setInterval>;
   /** Reference to the beforeunload handler (for removal in stop()). */

@@ -14,7 +14,6 @@ section {
   width: 100%;
   padding-top: 86px;
   padding-bottom: 10px;
-
   padding-left: 48px;
   padding-right: clamp(20px, calc(100% / 12), 106px);
 
@@ -240,23 +239,22 @@ section {
 
 .message-actions {
   position: absolute;
-  left: 145px;
-  top: 50px;
+  left: 136px;
+  top: 24px;
   height: 40px;
   padding: 20px;
   background-color: $white;
   border: 1px solid $main1;
-  border-radius: 6px 24px 24px 24px;
+  border-radius: 12px;
   z-index: 99;
   @include flexBox(row, initial, center, 5);
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3) inset, 
 	-4px -4px 8px rgba(0, 0, 0, 0.3) inset;
-
+  max-width: 280px;
   opacity: 0;
   transform: translateX(-50px);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-
+  transition: opacity 222ms ease, transform 222ms ease;
   section:hover &,
   &.always {
     opacity: 1;
@@ -265,8 +263,10 @@ section {
   }
 
   &.user-message-actions {
-    right: initial;
-    left: 0;
+    top: 24px !important;
+    border-radius: 12px !important;
+    right: 136px !important;
+    left: unset !important;
     transform: translateX(50px);
 
     section:hover &,
@@ -289,8 +289,8 @@ section {
 
 emoji-mart {
   position: absolute;
-  left: 134px;
-  top: 248px;
+  left: 0;
+  top: 46px;
   border-radius: 12px;
   overflow: hidden;
   z-index: 99;
@@ -309,24 +309,37 @@ emoji-mart {
   position: absolute;
   top: 48px;
   right: 40px;
-  padding: 6px 8px;
+  padding: 6px;
   background: $white;
-  border-radius: 28px 0 28px 28px;
+  border-radius: 22px 0 22px 22px;
   box-shadow: 0 6px 10px 0 oklch(from #{$accent} calc(l + 0.03) c h / 0.6),
   4px -4px 10px 0 oklch(from #{$accent} l c h / 0.9);
   z-index: 99;
-  @include flexBox(column, stretch, stretch, 0);
+  @include flexBox(column, stretch, stretch, 6);
+
+  .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .material-symbols {
+      margin-left: 6px;
+      font-size: 21px;
+    }
+  }
 
   > div {
     cursor: pointer;
     padding: 10px 20px;
-    width: 220px;
+    width: 130px;
     font-weight: 600;
+    text-wrap: nowrap;
     border-radius: 100px;
     &:hover {
       color: $accent;
-      font-weight: 700;
       background: $main1;
+      .material-symbols {
+        color: $accent;
+      }
     }
   }
 }
@@ -348,6 +361,11 @@ emoji-mart {
       height: 60px;
     }
   }
+  .message-actions {
+    left: 94px !important;
+    max-width: 200px;
+    top: 30px !important;
+  }
   .row-reverse {
     padding-right: 26px;
     padding-left: clamp(20px, calc(100% / 12), 106px);
@@ -355,56 +373,31 @@ emoji-mart {
       left: unset;
       right: 26px;
     }
-  }
-}
-
-
-@media (max-width: 660px) {
-  emoji-mart {
-    left: 80px;
-  }
-}
-
-
-@media (max-width: 560px) {
-  emoji-mart {
-    left: 40px;
-  }
-}
-
-
-@media (max-width: 500px) {
-  emoji-mart {
-    left: 20px;
-  }
-}
-
-
-@media (max-width: 400px) {
-  emoji-mart {
-    left: 0;
-    max-width: 302px;
-  }
-}
-
-
-@media (max-width: 510px) {
-  .message-actions {
-    position: absolute;
-    right: unset !important;
-    left: 8px !important;
-    top: 68px;
-    max-width: 280px;
-  }
-  .row-reverse {
     .message-actions {
-      top: 68px;
-      right: unset !important;
-      left: 8px !important;
-      @include flexBox(row, initial, center, 0);
-      .owner-occupied-removed {
-        display: none;
-      }
+      top: 30px !important;
+      right: 94px !important;
+      width: 100px;
     }
   }
+  .edit-message {
+    border: solid 2px red !important;
+  }
 }
+
+
+@media (max-width: 470px) {
+  emoji-mart {
+    left: -100px;
+  }
+}
+
+
+@media (max-width: 365px) {
+  emoji-mart {
+    left: -94px;
+    max-width: 300px;
+  }
+}
+
+
+

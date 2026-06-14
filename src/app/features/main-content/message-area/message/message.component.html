@@ -60,7 +60,6 @@
         shownReactionNumber > 7) {
         <div (click)="setShownReactionNumber()">Weniger anzeigen</div>
         }
-        <span class="material-symbols" (click)="toggleEmojiPicker($event)">add_reaction</span>
       </div>
       }@if (message.mThreadId && chatType !== 'thread' && replyCount > 0) {
       <div class="thread-field" (click)="onThreadClick()">
@@ -98,8 +97,11 @@
 
     @if (isOptionsOpen) {
     <div #optionsMenu class="options-menu" [class.active-user-options]="message.mSenderId === activeUserId">
-      <div (click)="openEdit()">Nachricht bearbeiten</div>
-      <div (click)="togglePermanentDelete()">Nachricht löschen</div>
+      <div (click)="openEdit()">Bearbeiten</div>
+      <div (click)="togglePermanentDelete()" class="wrapper">
+        Löschen 
+        <div class="material-symbols">delete</div>
+      </div>
     </div>
     }
 
