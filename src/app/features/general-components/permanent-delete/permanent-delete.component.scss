@@ -1,3 +1,4 @@
+@use "../../../shared/scss/variables" as vari;
 .overlay {
   position: fixed;
   inset: 0;
@@ -9,7 +10,7 @@
 }
 
 .modal {
-  background: #ffffff;
+  background: vari.$white;
   border-radius: 30px;
   padding: 45px 40px;
   width: min(90%, 480px);
@@ -40,20 +41,24 @@
     }
 
     .cancel {
-      background: #ffffff;
-      color: #686868;
-      border: 1px solid #686868;
+      background: vari.$white;
+      color: vari.$grey;
+      border: 1px solid vari.$grey;
+      transition: 222ms ease-in-out;
       &:hover {
-        background: #eceefe;
-        color: #444df2;
-        border: 1px solid #797ef3;
+        background: vari.$main1;
+        color: vari.$accent;
+        border: 1px solid vari.$main2;
+        transform: scale(1.07);
       }
     }
     .confirm {
-      background: #d80e0ecc;
-      color: #ffffff;
+      background: oklch(from #{vari.$warn} calc(l - 0.02) calc(c + 0.03) h / 0.8);
+      color: vari.$white;
+      transition: 222ms ease-in-out;
       &:hover {
-        background: #d30808;
+        background: oklch(from #{vari.$warn} calc(l - 0.09) calc(c + 0.04) h);
+        transform: scale(1.07);
       }
     }
   }

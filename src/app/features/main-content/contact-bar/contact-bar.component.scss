@@ -6,9 +6,10 @@ main {
   height: 100%;
   min-height: 0;
   padding: 0 10px 30px 16px;
-  background-color: white;
-  border-radius: 30px;
-  overflow: hidden;
+  background-color: $white;
+  border-radius: 20px;
+  border: solid 2px oklch(from #{$main2} calc(l + 0.14) calc(c - 0.07) h); 
+  // overflow: hidden;
 }
 
 section {
@@ -16,13 +17,12 @@ section {
   min-height: 0;
   overflow-y: auto; 
   @include flexBox(column, initial, initial, 10);
-  
 }
 
 section::-webkit-scrollbar-track {
   // margin-top: 40px;
   // margin-bottom: 40px;
-  background: #ECEEFE;
+  background: $main1;
 }
 
 section::-webkit-scrollbar {
@@ -32,13 +32,13 @@ section::-webkit-scrollbar {
 
 section::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.5);
-  background: #aab3f8;
+  background: $scrollbar;
   border-radius: 8px;
 }
 
 /* Mozilla */
 section {
-    scrollbar-color: #aab3f8 #ECEEFE;
+    scrollbar-color: $scrollbar $main1;
     scrollbar-width: auto;
 }
 

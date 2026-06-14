@@ -15,13 +15,14 @@ header {
   @include flexBox("", center, center, "");
   height: 30px;
   width: 30px;
-  background-color: white;
+  background-color: $white;
   border: none;
   cursor: pointer;
 }
 
 .showChannelsIcon {
   font-size: 30px;
+  color: $black;
 }
 
 .channelHeadShow {
@@ -40,6 +41,7 @@ header {
 .addIcon,
 .hashtagIcon {
   font-size: 24px;
+  color: $black;
 }
 
 .channelHeadShow:hover .workSpaceIcon,
@@ -49,7 +51,7 @@ header {
 .addChannel:hover span,
 .everyChannel:hover span,
 .everyChannel:hover .hashtagIcon {
-  color: #535af1;
+  color: $accent;
   cursor: pointer;
 }
 
@@ -58,10 +60,10 @@ header {
   height: 30px;
   width: 30px;
   border: none;
-  background-color: white;
+  background-color: $white;
   border-radius: 50%;
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
@@ -75,11 +77,11 @@ section {
   width: 220px;
   height: 32px;
   margin-left: 32px;
-  background-color: white;
+  background-color: $white;
   border: none;
   cursor: pointer;
   span {
-    @include fontStyle(18px, black, 400);
+    @include fontStyle(18px, $black, 400);
   }
 }
 
@@ -89,20 +91,24 @@ section {
   max-width: 28px;
   padding: 2px;
   border: none;
-  background-color: white;
+  background-color: $white;
   border-radius: 50%;
   &:hover{
-    background-color: #e70000bf !important;
-    color: white;
+    background-color: oklch(from #{$warn} calc(l - 0.02) calc(c + 0.03) h / 0.75) !important;
+    color: $white;
   }
 }
 
 .closeIcon{
   font-size: 24px;
+  color: $black;
+  &:hover {
+    color: $white;
+  }
 }
 
 .everyChannel:hover .deleteChannel{
-  background-color: #eceefe;
+  background-color: $main1;
 }
 
 .everyChannel {
@@ -113,11 +119,11 @@ section {
   padding: 0 20px;
   border-radius: 20px;
   cursor: pointer;
-  background-color: white;
+  background-color: $white;
   border: none;
   position: relative;
   span {
-    @include fontStyle(18px, black, 400);
+    @include fontStyle(18px, $black, 400);
     text-align: left;
     max-height: 28px;
     width: 170px;
@@ -134,7 +140,7 @@ section {
     top: 12px;
   }
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
@@ -147,8 +153,8 @@ section {
 
 // Markierung des Hashtag-Icon für ungelesene Nachrichten
 .everyChannel.hasUnread .hashtagIcon {
-  color: var(--indicatorNewMessage);
-  border: solid 2px var(--indicatorNewMessage);
+  color: $main2;
+  border: solid 2px $main2;
 }
 
 .newChannels {
@@ -159,13 +165,14 @@ section {
 .addIconChannel {
   height: 20px;
   width: 20px;
-  border: 1px solid black;
+  color: $black;
+  border: 1px solid $black;
   border-radius: 50%;
 }
 
 .addChannel:hover .addIconChannel {
-  color: #535af1;
-  border-color: #535af1;
+  color: $accent;
+  border-color: $accent;
 }
 
 .d-none {

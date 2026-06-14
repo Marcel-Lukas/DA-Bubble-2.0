@@ -17,7 +17,7 @@ main {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
+  background-color: $white;
   border-radius: 30px;
   padding: 40px;
   animation: slideInFromLeft 0.8s ease-out forwards;
@@ -41,7 +41,7 @@ main {
 app-add-new-members {
   @include flexBox(column, top, left, 20);
   width: 710px;
-  background-color: white;
+  background-color: $white;
   border-radius: 30px;
   padding: 40px;
 }
@@ -69,7 +69,7 @@ header {
   width: 800px;
   height: 40px;
   span {
-    @include fontStyle(24px, black, 700);
+    @include fontStyle(24px, $black, 700);
   }
 }
 
@@ -77,25 +77,25 @@ header {
   @include flexBox("", center, center, "");
   height: 40px;
   width: 40px;
-  background-color: white;
+  background-color: $white;
   border-radius: 50%;
   border: none;
   cursor: pointer;
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
 .closeButton:hover img {
-  background-color: #eceefe;
+  background-color: $main1;
 }
 
 .closeButton:hover div {
-  color: #535af1;
+  color: $accent;
 }
 
 .addChannelText {
-  @include fontStyle(18px, black, 400);
+  @include fontStyle(18px, $black, 400);
   height: 50px;
   width: 800px;
 }
@@ -107,22 +107,22 @@ header {
 }
 
 .errorText{
-  color: #da243c;
+  color: $warn;
 }
 
 .addChannelButton.disabled,
 .addChannelButton[disabled] {
-  background-color: #686868;
+  background-color: $grey;
   cursor: not-allowed;
   pointer-events: none;
 }
 
 .channelField {
-  @include fontStyle(18px, black, 700);
+  @include fontStyle(18px, $black, 700);
 }
 
 .channelFieldOptional {
-  @include fontStyle(18px, #686868, 400);
+  @include fontStyle(18px, $grey, 400);
   margin-left: 4px;
 }
 
@@ -132,7 +132,7 @@ header {
   width: 800px;
   height: 60px;
   border-radius: 40px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   input {
     height: 25px;
     width: 800px;
@@ -145,7 +145,7 @@ header {
 }
 
 input::placeholder {
-  @include fontStyle(18px, #686868, 400);
+  @include fontStyle(18px, $grey, 400);
 }
 
 .channelTextArea {
@@ -153,7 +153,7 @@ input::placeholder {
   width: 800px;
   height: 60px;
   border-radius: 40px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   textarea {
     height: 25px;
     width: 100%;
@@ -167,7 +167,7 @@ input::placeholder {
 }
 
 textarea::placeholder {
-  @include fontStyle(18px, #686868, 400);
+  @include fontStyle(18px, $grey, 400);
 }
 
 .addChannel {
@@ -180,7 +180,7 @@ textarea::placeholder {
   @include fontStyle(18px, white, 700);
   height: 50px;
   width: 130px;
-  background-color: #444df2;
+  background-color: $accent;
   border-radius: 25px;
   border: none;
   cursor: pointer;

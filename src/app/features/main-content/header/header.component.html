@@ -1,24 +1,30 @@
 <header class="nunitoFont">
+
   @if (messageIn) {
-  <div class="messageInWorkspace">
-    <button (click)="toggleMessageInView()">
-      <div class="material-symbols arrowLeft">keyboard_arrow_left</div>
-      <img src="assets/img/workspaceLogo.png" />
-    </button>
-    <h1>Devespace</h1>
-  </div>
+    <div class="messageInWorkspace">
+      <button (click)="toggleMessageInView()">
+        <div class="material-symbols arrowLeft">keyboard_arrow_left</div>
+        <img src="assets/img/workspaceLogo.png" />
+      </button>
+      <h1>Devespace</h1>
+    </div>
   } @else {
-  <img src="assets/img/logo.png" />
+    <div class="logo">
+      <img src="assets/img/logo.png" />
+      <span>DA-Bubble</span>
+    </div>
   }
+  
   <app-device-visible mode="desktopBig">
     <app-search-bar
       (openChat)="openChat.emit($event)"
       (openThread)="openThread.emit($event)"
-      >></app-search-bar
-    >
+      >></app-search-bar>
   </app-device-visible>
+
   <app-user-name
     [activeUserId]="activeUserId"
     (openChat)="openChat.emit($event)"
   ></app-user-name>
+
 </header>

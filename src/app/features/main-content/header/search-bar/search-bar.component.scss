@@ -1,3 +1,4 @@
+@use "../../../../shared/scss/variables" as vari;
 .backdrop {
   position: fixed;
   top: 0;
@@ -36,13 +37,13 @@ app-search-information {
   border: none;
   right: 45px;
   top: 17.5px;
-  background-color: white;
+  background-color: vari.$white;
   z-index: 80;
   cursor: pointer;
   > img {
     height: 35px;
     width: 35px;
-    background-color: white;
+    background-color: vari.$white;
   }
 }
 
@@ -55,14 +56,14 @@ input {
   width: 100%;
   padding: 17.5px 45px;
   border-radius: 42px;
-  background-color: white;
+  background-color: vari.$white;
   border: none;
   z-index: 60;
 
 }
 
 input:focus {
-  outline: 2px solid #444df2;
+  outline: 2px solid vari.$accent;
 }
 
 @media (max-width: 1450px) {
@@ -78,7 +79,7 @@ input:focus {
 @media (max-width: 1000px) {
   input {
     height: 56px;
-    border: 1px solid #adb0d9;
+    border: 1px solid vari.$main1;
   }
 
   .searchButton {

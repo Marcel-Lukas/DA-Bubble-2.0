@@ -12,11 +12,11 @@
     > span {
       cursor: pointer;
       font-size: clamp(14px, 2.5vw, 18px);
-      color: vari.$light-blue;
+      color: vari.$main2;
       transition: color 0.2s ease;
 
       &:hover {
-        color: vari.$dark-blue;
+        color: vari.$accent;
       }
     }
   }
@@ -37,7 +37,7 @@
     position: relative;
     width: clamp(14px, 2.5vw, 18px);
     height: clamp(14px, 2.5vw, 18px);
-    border: 2px solid vari.$light-blue;
+    border: 2px solid vari.$main2;
     border-radius: 2px;
     background-color: transparent;
     cursor: pointer;
@@ -52,17 +52,17 @@
       height: clamp(2px, 0.5vw, 4px);
       border-bottom: 2px solid;
       border-left: 2px solid;
-      border-color: vari.$light-blue;
+      border-color: vari.$main2;
       transform: rotate(-45deg);
     }
 
     &:hover {
-      border-color: vari.$dark-blue;
-      box-shadow: 0 0 0 5px vari.$sky-grey;
-      background-color: vari.$sky-grey;
+      border-color: vari.$accent;
+      box-shadow: 0 0 0 5px vari.$main1;
+      background-color: vari.$main1;
 
       &:checked::after {
-        border-color: vari.$dark-blue;
+        border-color: vari.$accent;
       }
     }
   }

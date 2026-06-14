@@ -21,10 +21,10 @@ section {
     border-radius: 50%;
   }
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
     .message-text {
-      color: #000000;
-      background-color: #ffffff;
+      color: $black;
+      background-color: $white;
     }
   }
 }
@@ -35,8 +35,8 @@ section {
   flex-direction: row-reverse;
   &:hover {
     .message-text {
-      color: #ffffff;
-      background-color: #797ef3;
+      color: $white;
+      background-color: $main2;
     }
   }
   .message-actions {
@@ -55,14 +55,14 @@ section {
 }
 
 .edit-open {
-  background-color: #eceefe;
+  background-color: $main1;
 }
 
 .edit-message {
   width: 100%;
   padding: 20px;
-  background-color: #ffffff;
-  border: 1px solid #adb0d9;
+  background-color: $white;
+  border: 1px solid $main1;
   border-radius: 20px;
   @include flexBox(column, initial, initial, 16);
 
@@ -87,13 +87,13 @@ section {
 }
 
 .blue-hover:hover {
-  background-color: #eceefe;
+  background-color: $main1;
 }
 
 .textfield-icon {
-  color: #686868;
+  color: $grey;
   &:hover {
-    color: #535af1;
+    color: $accent;
   }
 }
 
@@ -105,7 +105,7 @@ section {
     h3 {
       cursor: pointer;
       &:hover {
-        color: #444df2;
+        color: $accent;
       }
     }
   }
@@ -114,22 +114,22 @@ section {
     width: fit-content;
     padding: 15px;
     border-radius: 0px 30px 30px 30px;
-    background-color: #eceefe;
+    background-color: $main1;
     word-break: break-word;
     white-space: pre-wrap;
     font-size: 18px;
 
     .mention {
       cursor: pointer;
-      color: #535af1;
+      color: $accent;
       font-weight: 700;
       border-radius: 4px;
       padding: 0 2px;
       transition: background-color 0.15s ease, color 0.15s ease;
 
       &:hover {
-        color: #444df2;
-        background-color: rgba(83, 90, 241, 0.12);
+        color: $accent;
+        background-color: oklch(from #{$accent} calc(l + 0.03) c h / 0.12);
       }
     }
   }
@@ -148,16 +148,16 @@ section {
   }
 
   .message-text {
-    color: #ffffff;
-    background-color: #797ef3;
+    color: $white;
+    background-color: $main2;
     border-radius: 30px 0px 30px 30px;
 
     .mention {
-      color: #ffffff;
+      color: $white;
       text-decoration: underline;
 
       &:hover {
-        color: #ffffff;
+        color: $white;
         background-color: rgba(255, 255, 255, 0.22);
       }
     }
@@ -175,11 +175,11 @@ section {
     cursor: pointer;
     height: 34px;
     padding: 5px 10px;
-    background-color: #ffffff;
-    border: 1px solid #adb0d9;
+    background-color: $white;
+    border: 1px solid $main1;
     border-radius: 20px;
     &:hover {
-      border: 1px solid #444df2;
+      border: 1px solid $accent;
       .reaction-details {
         display: flex;
       }
@@ -197,8 +197,8 @@ section {
   left: 32px;
   width: 160px;
   padding: 16px 8px;
-  color: #ffffff;
-  background-color: #444df2;
+  color: $white;
+  background-color: $accent;
   border-radius: 30px 30px 30px 0px;
   @include flexBox(column, center, center, 5);
   display: none;
@@ -227,8 +227,8 @@ section {
   top: 50px;
   height: 40px;
   padding: 20px;
-  background-color: #ffffff;
-  border: 1px solid #8f93c9;
+  background-color: $white;
+  border: 1px solid $main1;
   border-radius: 6px 24px 24px 24px;
   z-index: 99;
   @include flexBox(row, initial, center, 5);
@@ -292,10 +292,10 @@ emoji-mart {
   top: 48px;
   right: 40px;
   padding: 6px 8px;
-  background: #ffffff;
+  background: $white;
   border-radius: 28px 0 28px 28px;
-  box-shadow: 0 6px 10px 0 rgba(81, 85, 202, 0.6),
-  4px -4px 10px 0 rgba(64, 68, 172, 0.9);
+  box-shadow: 0 6px 10px 0 oklch(from #{$accent} calc(l + 0.03) c h / 0.6),
+  4px -4px 10px 0 oklch(from #{$accent} l c h / 0.9);
   z-index: 99;
   @include flexBox(column, stretch, stretch, 0);
 
@@ -306,9 +306,9 @@ emoji-mart {
     font-weight: 600;
     border-radius: 100px;
     &:hover {
-      color: #535af1;
+      color: $accent;
       font-weight: 700;
-      background: #eceefe;
+      background: $main1;
     }
   }
 }

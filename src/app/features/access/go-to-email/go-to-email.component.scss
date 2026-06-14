@@ -7,11 +7,11 @@
 }
 
 h1 {
-  @include mixin.accHead(vari.$dark-blue);
+  @include mixin.accHead(vari.$accent);
 }
 
 p {
   text-align: center;
   font-size: clamp(16px, 3vw, 20px);
-  color: vari.$gray;
+  color: vari.$grey;
 }

@@ -21,77 +21,77 @@ button {
 }
 
 .btn-blue {
-  @include mixin.btnColor($bg-color: vari.$dark-blue, $bor-color: vari.$dark-blue, $text-color: vari.$white);
+  @include mixin.btnColor($bg-color: vari.$accent, $bor-color: vari.$accent, $text-color: vari.$white);
 
   &:hover:not(:disabled) {
-    @include mixin.btnColor($bg-color: vari.$light-blue, $bor-color: vari.$light-blue, $text-color: vari.$white);
+    @include mixin.btnColor($bg-color: vari.$main2, $bor-color: vari.$main2, $text-color: vari.$white);
   }
 
   &:active:not(:disabled) {
-    @include mixin.btnColor($bg-color: vari.$dark-blue, $bor-color: vari.$dark-blue, $text-color: vari.$white);
+    @include mixin.btnColor($bg-color: vari.$accent, $bor-color: vari.$accent, $text-color: vari.$white);
   }
 
   &:disabled {
-    @include mixin.btnColor($bg-color: vari.$gray, $bor-color: vari.$gray, $text-color: vari.$white);
+    @include mixin.btnColor($bg-color: vari.$grey, $bor-color: vari.$grey, $text-color: vari.$white);
   }
 }
 
 .btn-white {
-  @include mixin.btnColor($bg-color: transparent, $bor-color: vari.$light-blue, $text-color: vari.$dark-blue);
+  @include mixin.btnColor($bg-color: transparent, $bor-color: vari.$main2, $text-color: vari.$accent);
 
   &:hover:not(:disabled) {
-    @include mixin.btnColor($bg-color: vari.$purple, $bor-color: vari.$purple, $text-color: vari.$white);
+    @include mixin.btnColor($bg-color: vari.$accent, $bor-color: vari.$accent, $text-color: vari.$white);
   }
 
   &:active:not(:disabled) {
-    @include mixin.btnColor($bg-color: vari.$dark-blue, $bor-color: vari.$dark-blue, $text-color: vari.$white);
+    @include mixin.btnColor($bg-color: vari.$accent, $bor-color: vari.$accent, $text-color: vari.$white);
   }
 
   &:disabled {
-    @include mixin.btnColor($bg-color: transparent, $bor-color: vari.$gray, $text-color: vari.$gray);
+    @include mixin.btnColor($bg-color: transparent, $bor-color: vari.$grey, $text-color: vari.$grey);
   }
 }
 
 .btn-gray {
-  @include mixin.btnColor($bg-color: vari.$sky-grey, $bor-color: vari.$sky-grey, $text-color: vari.$dark-blue);
+  @include mixin.btnColor($bg-color: vari.$main1, $bor-color: vari.$main1, $text-color: vari.$accent);
   width: 100%;
 
   &:hover:not(:disabled) {
-    border-color: vari.$dark-blue;
+    border-color: vari.$accent;
   }
 
   &:active:not(:disabled) {
-    border-color: vari.$gray;
+    border-color: vari.$grey;
   }
 
   &:disabled {
-    border-color: vari.$gray;
-    color: vari.$gray;
+    border-color: vari.$grey;
+    color: vari.$grey;
   }
 }
 
 .btn-transparent {
   padding: 10px 15px;
-  @include mixin.btnColor($bg-color: transparent, $bor-color: transparent, $text-color: vari.$light-blue);
+  @include mixin.btnColor($bg-color: transparent, $bor-color: transparent, $text-color: vari.$main2);
 
   &:hover:not(:disabled) {
-    @include mixin.btnColor($bg-color: transparent, $bor-color: #adb0d9, $text-color: vari.$dark-blue);
+    @include mixin.btnColor($bg-color: transparent, $bor-color: vari.$main1, $text-color: vari.$accent);
   }
 
   &:disabled {
-    color: vari.$gray;
+    color: vari.$grey;
   }
 }
 
 .btn-sky-grey {
   padding: 5px 15px;
-  @include mixin.btnColor($bg-color: transparent, $bor-color: transparent, $text-color: vari.$light-blue);
+  @include mixin.btnColor($bg-color: transparent, $bor-color: transparent, $text-color: vari.$main2);
 
   &:hover:not(:disabled) {
-    @include mixin.btnColor($bg-color: vari.$sky-grey, $bor-color: transparent, $text-color: vari.$dark-blue);
+    @include mixin.btnColor($bg-color: vari.$main1, $bor-color: transparent, $text-color: vari.$accent);
   }
 
   &:disabled {
-    color: vari.$gray;
+    color: vari.$grey;
   }
 }

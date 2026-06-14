@@ -1,4 +1,5 @@
 @use "../../../shared/scss/global" as *;
+
 main {
   position: absolute;
   top: 0;
@@ -14,7 +15,7 @@ section {
   position: absolute;
   left: 50%;
   top: 50%;
-  background-color: white;
+  background-color: $white;
   transform: translate(-50%, -50%);
   height: fit-content;
   width: 870px;
@@ -55,7 +56,7 @@ header {
     width: 24px;
   }
   span {
-    @include fontStyle(18px, black, 400);
+    @include fontStyle(18px, $black, 400);
   }
 }
 
@@ -65,19 +66,19 @@ header {
   width: 40px;
   border: none;
   border-radius: 50%;
-  background-color: white;
+  background-color: $white;
   cursor: pointer;
   div {
     @include flexBox("", center, center, "");
     font-size: 24px;
   }
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
 .closeChannelLeave:hover div {
-  color: #535af1;
+  color: $accent;
 }
 
 .nameBox {
@@ -85,7 +86,7 @@ header {
   height: 110px;
   width: 100%;
   border-radius: 20px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   padding: 20px;
 }
 
@@ -106,14 +107,14 @@ header {
   height: 25px;
   width: 770px;
   button {
-    @include fontStyle(18px, #535af1, 600);
-    background-color: white;
+    @include fontStyle(18px, $accent, 600);
+    background-color: $white;
     border: none;
     padding: 4px 8px;
     border-radius: 50px;
     cursor: pointer;
     &:hover {
-      background-color: #eceefe;
+      background-color: $main1;
     }
   }
 }
@@ -125,7 +126,7 @@ header {
     width: 24px;
   }
   span {
-    @include fontStyle(18px, black, 400);
+    @include fontStyle(18px, $black, 400);
   }
 }
 
@@ -135,7 +136,7 @@ header {
   height: 60px;
   padding: 0px 20px;
   border-radius: 40px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   img {
     height: 24px;
     width: 24px;
@@ -154,7 +155,7 @@ header {
   height: 280px;
   width: 100%;
   padding: 20px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   border-radius: 20px;
 }
 
@@ -174,7 +175,7 @@ header {
   @include flexBox("", "", center, "");
   width: 100%;
   height: 60px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   padding: 0 20px;
   border-radius: 30px;
   textarea {
@@ -188,7 +189,7 @@ header {
 }
 
 .errorText{
-  color: rgb(237, 30, 75);
+  color: $warn;
 }
 
 .editOverMobil{
@@ -196,15 +197,15 @@ header {
 }
 
 .editButton{
-  @include fontStyle(18px, #535af1, 600);
-  background-color: white;
+  @include fontStyle(18px, $accent, 600);
+  background-color: $white;
   border: none;
   padding: 4px 8px;
   border-radius: 50px;
 
   cursor: pointer;
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
@@ -237,12 +238,12 @@ header {
 
 .xLine {
   width: 100%;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
 }
 
 .xLineSave {
   width: 740px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   margin: 0 auto;
 }
 
@@ -251,7 +252,7 @@ header {
   height: 80px;
   width: 100%;
   span {
-    @include fontStyle(24px, #535af1, 400);
+    @include fontStyle(24px, $accent, 400);
   }
 }
 
@@ -264,7 +265,7 @@ header {
     border-radius: 25px;
     width: 200px;
     height: 50px;
-    background-color: #444df2;
+    background-color: $accent;
     border: none;
     cursor: pointer;
     &:hover {
@@ -316,17 +317,17 @@ header {
 
 .confirmLeaveModal {
   @include flexBox(column, "", "", 20);
-  background-color: white;
+  background-color: $white;
   border-radius: 30px;
   padding: 40px;
   width: 500px;
   max-width: 90%;
   animation: fadeInSlide 200ms ease-out forwards;
   h2 {
-    @include fontStyle(24px, black, 700);
+    @include fontStyle(24px, $black, 700);
   }
   p {
-    @include fontStyle(18px, black, 400);
+    @include fontStyle(18px, $black, 400);
     span {
       font-weight: 700;
     }
@@ -348,12 +349,12 @@ header {
     }
   }
   .cancelBtn {
-    background-color: white;
-    color: #444df2;
-    border: 1px solid #444df2;
+    background-color: $white;
+    color: $accent;
+    border: 1px solid $accent;
   }
   .confirmBtn {
-    background-color: #444df2;
+    background-color: $accent;
   }
 }
 
@@ -447,7 +448,7 @@ header {
     width: 100%;
     height: 340px;
     border-radius: 30px 30px 0 0;
-    background-color: white;
+    background-color: $white;
     z-index: 100;
     padding: 20px
   }
@@ -455,7 +456,7 @@ header {
   .memberListMobile {
     @include flexBox("", left, center, "");
     width: 100%;
-    border: 1px solid #adb0d9;
+    border: 1px solid $main1;
     border-radius: 20px;
     padding: 30px 20px;
   }

@@ -47,14 +47,14 @@
                 </div>
                 @if (isActive) {
                     <div class="status">
-                        <img src="assets/img/green_point.png">
-                        <span class="statusActive">Aktive</span>
+                        <div class="statusDot statusActive"></div>
+                        <span class="hint">Aktive</span>
                     </div>
                 }
                 @else {
                     <div class="status">
-                        <img src="assets/img/grey_point.png">
-                        <span class="statusAbsent">Abwesend</span>
+                        <div class="statusDot statusAbsent"></div>
+                        <span class="hint">Abwesend</span>
                     </div>
                 }
             </div>
@@ -89,7 +89,7 @@
         }
         @if (showButton) {
             <div class="messageArea">
-                <button (click)="onStartChat()" class="messageButton messageButtonBackgroundBlue">
+                <button (click)="onStartChat()" class="button messageButtonBackgroundBlue">
                     <img src="assets/icons/mode_comment.svg">
                     <span>Nachricht</span>
                 </button>
@@ -98,8 +98,8 @@
         @else {
             @if (!showEditProfil) {
                 <div class="messageArea">
-                    <button (click)="deleteMember()" class="messageButton messageButtonBackgroundPink">
-                        <div class="material-symbols closeIcon">delete</div>
+                    <button (click)="deleteMember()" class="button deleteButtonBackground">
+                        <div class="material-symbols deleteIcon">delete</div>
                         <span>Löschen</span>
                     </button>
                 </div>

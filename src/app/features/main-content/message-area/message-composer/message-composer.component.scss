@@ -26,8 +26,8 @@ emoji-mart {
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
-  background-color: #ffffff;
-  border: 1px solid #adb0d9;
+  background-color: $white;
+  border: 1px solid $main1;
   border-radius: 20px 20px 20px 0px;
   @include flexBox(column, initial, initial, 16);
   z-index: 98;
@@ -40,7 +40,7 @@ emoji-mart {
       padding: 0;
     }
     &:hover {
-      background-color: #eceefe;
+      background-color: $main1;
       border-radius: 30px;
     }
   }
@@ -51,8 +51,8 @@ emoji-mart {
   margin-bottom: 4px;
   padding: 6px 12px;
   border-radius: 12px;
-  color: #d14343;
-  background-color: #ffecec;
+  color: $warn;
+  background-color: oklch(from #{$warn} l c h / 0.12);
   animation: rateLimitFade 222ms ease-in;
   .material-symbols {
     font-size: 18px;
@@ -94,11 +94,11 @@ textarea.rate-limited {
 .send-icon {
   width: 30px;
   height: 30px;
-  color: #797ef3;
+  color: $main2;
   font-size: 30px;
   font-variation-settings: "FILL" 1;
   &:hover {
-    color: #444df2;
+    color: $accent;
   }
 }
 
@@ -112,19 +112,19 @@ textarea.rate-limited {
   @include flexBox(row, center, center, 0);
   &:disabled {
     .send-icon {
-      color: #686868;
+      color: $grey;
       cursor: not-allowed;
     }
   }
 }
 
 .blue-hover:hover {
-  background-color: #eceefe;
+  background-color: $main1;
 }
 
 .textfield-icon {
-  color: #686868;
+  color: $grey;
   &:hover {
-    color: #535af1;
+    color: $accent;
   }
 }

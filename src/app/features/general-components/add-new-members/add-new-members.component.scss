@@ -4,7 +4,7 @@
 
 .addMemberChannel {
   @include flexBox("", left, center, 15);
-  color: #797ef3;
+  color: $main2;
 }
 
 .addMemberHeader {
@@ -21,22 +21,22 @@
   @include flexBox("", center, center, "");
   height: 40px;
   width: 40px;
-  background-color: white;
+  background-color: $white;
   border: none;
   border-radius: 50%;
   cursor: pointer;
 
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
 .closeIconButton:hover .closeIcon {
-  color: #444df2;
+  color: $accent;
 }
 
 .devspaceElement {
-    @include fontStyle(18px, #444df2, 400);
+    @include fontStyle(18px, $accent, 400);
     text-decoration: none;
     cursor: pointer;
 }
@@ -54,7 +54,7 @@
   height: 50px;
   border-radius: 25px;
   border: none;
-  background-color: #686868;
+  background-color: $grey;
   position: absolute;
   bottom: 8px;
   z-index: 100;
@@ -63,7 +63,7 @@
     opacity: 0.8;
   }
   &.active {
-    background-color: #444df2;
+    background-color: $accent;
     cursor: pointer;
   }
 
@@ -77,7 +77,7 @@
     z-index: 1001;
     width: 95%;
     max-width: 410px;
-    background: white;
+    background: $white;
     border-radius: 16px;
     /* optional Schatten */
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -102,20 +102,20 @@
     height: 20px;
     aspect-ratio: 1 / 1;
     border-radius: 50%;
-    border: 2px solid #adb0d9;
+    border: 2px solid $main1;
     transition: 0.2s ease;
     cursor: pointer;
   }
 
   input[type="radio"]:checked + .radio-mark {
-    border-color: #535af1;
+    border-color: $accent;
   }
 
   .radio-mark::after {
     content: "";
     width: 12px;
     height: 12px;
-    background-color: #535af1;
+    background-color: $accent;
     border-radius: 50%;
     opacity: 0;
     transition: 0.2s ease;
@@ -150,11 +150,11 @@
   position: relative;
   height: 60px;
   border-radius: 30px;
-  border: 1px solid #adb0d9;
+  border: 1px solid $main1;
   z-index: 1001; 
 
   input {
-    @include fontStyle(18px, #686868, 400);
+    @include fontStyle(18px, $grey, 400);
     width: 100%;
     height: 40px;
     outline: none;
@@ -164,7 +164,7 @@
 
 .showMembers {
   @include flexBox(column, '', '', 15);
-  background-color: white;
+  background-color: $white;
   top: 124px;
   left: 20%;
   max-height: 200px;
@@ -187,15 +187,15 @@
   width: 100%;
   padding: 4px 16px;
   border-radius: 30px;
-  background-color: white;
+  background-color: $white;
   cursor: pointer;
   &:hover {
-    background-color: #eceefe;
+    background-color: $main1;
   }
 }
 
 .memberItem.selected {
-  background-color: #eceefe;
+  background-color: $main1;
 }
 
 .inputNamePush {
@@ -205,7 +205,7 @@
 
 .containerDelete{
   @include flexBox("", left, center, 15);
-  background-color: #eceefe;
+  background-color: $main1;
   width: fit-content;
   border-radius: 25px;
   padding: 0 20px;
@@ -223,13 +223,13 @@
 
 .inputNamePushClose {
   @include flexBox("", center, center, "");
-  background-color: #eceefe;
+  background-color: $main1;
   border: none;
   height: 32px;
   width: 32px;
   border-radius: 50%;
   &:hover {
-    background-color: white;
+    background-color: $white;
   }
 }
 
@@ -249,7 +249,7 @@
     height: 6px;
     width: 60px;
     border-radius: 23px;
-    background-color: #d9d9d9;
+    background-color: $grey;
   }
 
   .showMembers {

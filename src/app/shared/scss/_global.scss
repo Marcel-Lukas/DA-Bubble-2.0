@@ -6,8 +6,12 @@
 // files. Sass `@import` is deprecated, so they live here now and are
 // consumed via `@use`. The global rules in styles.scss are still
 // loaded once globally by Angular and must not be duplicated per
-// component.
+// component.//
+// Außerdem werden hier die zentralen Farbvariablen weitergeleitet,
+// damit Komponenten, die `@use ".../global" as *` einbinden, die
+// Farben direkt als $main1, $accent usw. verwenden können.
 
+@forward "variables";
 @mixin fontStyle($size, $fontColor, $fontWeight) {
   font-size: $size;
   color: $fontColor;

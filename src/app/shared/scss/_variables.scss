@@ -1,8 +1,20 @@
-$sky-grey: #eceefe;
-$gainsboro: #e6e6e6;
-$dark-blue: #444df2;
-$light-blue: #797ef3;
-$gray: #686868;
-$purple: #535AF1;
-$white: #FFFFFF;
-$rose: #CC3448;
+$main1: oklch(95.229% 0.02167 280.248); // Hintergrund
+$main2: oklch(64.515% 0.17164 278.594);
+$accent: oklch(52.639% 0.24108 272.253);
+
+$white: oklch(100% 0.00011 271.152);
+$grey: oklch(51.73% 0.00006 271.152);
+$black: oklch(0% 0 0);                  
+
+$warn: oklch(55.388% 0.18985 25.979);   // Warningtexte und rote Warn-Buttons
+$online: oklch(80.503% 0.19435 128.866); // Onlinestatus
+$offline: oklch(51.73% 0.00006 271.152); // Offlinestatus
+
+
+// Diese Farben werden per "relative color syntax" (oklch from …) aus dieser abgeleitet.
+// Ändert man die Farbe, ziehen die Varianten automatisch mit.
+//   l = Lightness, c = Chroma, h = Hue der Basisfarbe.
+
+// $main2, aber heller & etwas weniger gesättigt.
+$scrollbar: oklch(from #{$main2} calc(l + 0.14) calc(c - 0.07) h); // Scrollbars
+

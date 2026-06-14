@@ -8,15 +8,15 @@
 label {
   @include mixin.dFlex($gap: 18px);
   width: 100%;
-  background-color: vari.$sky-grey;
+  background-color: vari.$main1;
   padding: 18px 32px;
-  border: 1px solid vari.$sky-grey;
+  border: 1px solid vari.$main1;
   border-radius: 100px;
   transition: border-color 0.2s ease-in-out;
-  --icon-color: #686868;
+  --icon-color: #{vari.$grey};
 
   &:hover {
-    border-color: vari.$gray;
+    border-color: vari.$grey;
   }
 
   > input {
@@ -28,8 +28,8 @@ label {
   }
 
   &:has(> input:focus) {
-    border-color: vari.$purple;
-    --icon-color: #000000;
+    border-color: vari.$accent;
+    --icon-color: #{vari.$black};
   }
 
   @media (max-width: 700px) {

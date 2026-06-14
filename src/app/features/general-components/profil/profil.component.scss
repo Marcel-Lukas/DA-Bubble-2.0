@@ -1,364 +1,372 @@
-@use '../../../shared/scss/global' as *;
+@use "../../../shared/scss/global" as *;
 
-main{
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
 }
 
-section{
+section {
+  @include flexBox("", "", center, 40);
+  position: absolute;
+  flex-direction: column;
+  background-color: $white;
+  width: 500px;
+  &.small {
     @include flexBox("", "", center, 40);
-    position: absolute;
-    flex-direction: column;
-    background-color: white;
-    width: 500px;
-    &.small {
-        @include flexBox("", "", center, 40);
-        height: 640px;
-        padding: 30px 40px;
-        top: 104px;
-        right: 24px;
-        border-radius: 30px 0px 30px 30px;
-      }
-      &.big {
-        @include flexBox("", "", center, 45);
-        top: 50%;
-        right: auto;
-        left: 50%;
-        padding: 45px 40px;
-        transform: translate(-50%, -50%);
-        height: 700px;
-        border-radius: 30px;
-      }
+    height: 640px;
+    padding: 30px 40px;
+    top: 104px;
+    right: 24px;
+    border-radius: 30px 0px 30px 30px;
+  }
+  &.big {
+    @include flexBox("", "", center, 45);
+    top: 50%;
+    right: auto;
+    left: 50%;
+    padding: 45px 40px;
+    transform: translate(-50%, -50%);
+    height: 700px;
+    border-radius: 30px;
+  }
 }
 
-img{
-    height: 200px;
-    width: 200px;
-    border-radius: 50%;
+img {
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
 }
 
-.buttonImg{
-    height: 200px;
-    width: 200px;
-    border-radius: 50%;
-    cursor: pointer;
-    &:hover{
-        opacity: 0.8;
-    }
+.buttonImg {
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
-.avatarButtons{
-    @include flexBox('', center, center, 10);
+.avatarButtons {
+  @include flexBox("", center, center, 10);
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  img {
     height: 48px;
     width: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    img{
-        height: 48px;
-        width: 48px;
-    }
-    &:hover{
-        opacity: 0.8;
-    }
+  }
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
-.avatarsMain{
-    @include flexBox(column, center, center, 10);
-    position: relative;
+.avatarsMain {
+  @include flexBox(column, center, center, 10);
+  position: relative;
 }
 
-.avatarChoice{
-    @include flexBox('', center, center, 10);
-    position: absolute;
-    top: 210px;
-    background-color: white;
-    padding: 8px 24px;
-    border-radius: 50px;
-    box-shadow: 
-    -3px -3px 6px rgba(255, 255, 255, 0.6), 
-    6px 6px 16px rgba(0, 0, 0, 0.2), 
+.avatarChoice {
+  @include flexBox("", center, center, 10);
+  position: absolute;
+  top: 210px;
+  background-color: $white;
+  padding: 8px 24px;
+  border-radius: 50px;
+  box-shadow:
+    -3px -3px 6px rgba(255, 255, 255, 0.6),
+    6px 6px 16px rgba(0, 0, 0, 0.2),
     0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.randomAvatarButton{
-    @include flexBox('', center, center, 8);
-    padding: 8px 16px;
-    border: 1px solid #ADB0D9;
-    border-radius: 25px;
-    background-color: white;
-    color: #444DF2;
-    cursor: pointer;
-    font-size: 16px;
-    .material-symbols{
-        font-size: 20px;
-    }
-    &:hover{
-        background-color: #444DF2;
-        color: white;
-    }
+.randomAvatarButton {
+  @include flexBox("", center, center, 8);
+  padding: 8px 16px;
+  border: 1px solid $main1;
+  border-radius: 25px;
+  background-color: $white;
+  color: $accent;
+  cursor: pointer;
+  font-size: 16px;
+  .material-symbols {
+    font-size: 20px;
+  }
+  &:hover {
+    background-color: $accent;
+    color: $white;
+  }
 }
 
-header{
-    @include flexBox("", space-between, center, "");
-    height: 40px;
-    width: 100%;
+header {
+  @include flexBox("", space-between, center, "");
+  height: 40px;
+  width: 100%;
 }
 
-.closeProfil{
-    @include flexBox("", center, center, "");
-    height: 40px;
-    width: 40px;
-    border: none;
-    border-radius: 50%;
-    background-color: white;
-    cursor: pointer;
-    &:hover{
-        background-color: #ECEEFE;
-    }
+.closeProfil {
+  @include flexBox("", center, center, "");
+  height: 40px;
+  width: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: $white;
+  cursor: pointer;
+  &:hover {
+    background-color: $main1;
+  }
 }
 
-.closeIcon{
-    height: 24px;
-    width: 24px;
+.closeIcon {
+  height: 24px;
+  width: 24px;
+  color: $black;
+}
+
+.deleteIcon {
+  height: 24px;
+  width: 24px;
+  color: $white;
 }
 
 .closeProfil:hover .closeIcon,
-.editIconShow:hover .editIcon
-{
-    color: #535AF1;
+.editIconShow:hover .editIcon {
+  color: $accent;
 }
 
-.editIconShow{
-    display: none;
+.editIconShow {
+  display: none;
 }
 
-.nameActive{
-    height: 90px;
-    width: 100%;
+.nameActive {
+  height: 90px;
+  width: 100%;
 }
 
-.nameEdit{
-    @include flexBox("", space-between, center, "");
-    height: 45px;
-    width: 100%;
-    span{
-        @include fontStyle(32px, black, 700);
-    }
-    a{
-        @include fontStyle(18px, #535AF1, 600);
-        text-decoration: none;
-        border-radius: 25px;
-        cursor: pointer;
-        padding: 6px 12px;
-        &:hover{
-            background-color: #ECEEFE
-        }
-    }
-}
-
-.status{
-    @include flexBox("", left, center, 15);
-    width: 80px;
-    height: 30px;
-    img{
-        height: 16px;
-        width: 16px;
-    }
-}
-
-.statusActive{
-    color:#92C83E;
-}
-
-.statusAbsent{
-    color: #686868;
-}
-
-.mailAdress{
-    @include flexBox(column, '', '', 10);
-    width: 100%;
-    height: 60px;
-    div{
-        @include flexBox("", left, center, 20);
-        height: 30px;
-        width: 200px;
-        img{
-            width: 30px;
-            height: 30px;
-        }
-    }
-    span{
-        @include fontStyle(18px, #1381FF, 400);
-        height: 20px;
-        margin-left: 50px;
-    }
-}
-
-.messageArea{
-    @include flexBox('', center, center, '');
-    height: 50px;
-    width: 100%;
-}
-
-.messageButton{
-    @include flexBox('', center, center, 10);
-    @include fontStyle(18px, black, 700);
-    border-radius: 50px;
-    height: 100%;
-    width: 160px;
-    padding: 12px 25px;
-    
-    color: white;
-    border: none;
+.nameEdit {
+  @include flexBox("", space-between, center, "");
+  height: 45px;
+  width: 100%;
+  span {
+    @include fontStyle(32px, $black, 700);
+  }
+  a {
+    @include fontStyle(18px, $accent, 600);
+    text-decoration: none;
+    border-radius: 25px;
     cursor: pointer;
-    &:hover{
-        opacity: 0.8;
+    padding: 6px 12px;
+    &:hover {
+      background-color: $main1;
     }
-    img{
-        height: 24px;
-        width: 24px;
-    }
+  }
 }
 
-.messageButtonBackgroundBlue{
-    background-color: #444DF2;
+.status {
+  @include flexBox("", left, center, 10);
+  .statusDot {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+  }
+  .hint {
+    font-size: 18px;
+    color: $black;
+  }
+  .statusActive {
+    background-color: $online;
+  }
+  .statusAbsent {
+    background-color: $offline;
+  }
 }
 
-.messageButtonBackgroundPink{
-    background-color: #cc3448;
-}
 
-.editSaveButtons{
-    @include flexBox('', center, center, 10);
-}
 
-.editAccountText{
+
+.mailAdress {
+  @include flexBox(column, "", "", 10);
+  width: 100%;
+  height: 60px;
+  div {
     @include flexBox("", left, center, 20);
     height: 30px;
-    width: 100%;
-    img{
-        width: 30px;
-        height: 30px;
+    width: 200px;
+    img {
+      width: 30px;
+      height: 30px;
     }
+  }
+  span {
+    @include fontStyle(18px, $accent, 400);
+    height: 20px;
+    margin-left: 50px;
+  }
 }
 
-.editInput{
-    @include flexBox(column, '', '', 15);
-    height: 90px;
-    width: 100%;
-    input{
-        @include fontStyle(18px, #686868, 500);
-        width: 100%;
-        height: 50px;
-        border-radius: 30px;
-        border: 1px solid #ADB0D9;
-        padding: 15px 20px;   
-    }
+.messageArea {
+  @include flexBox("", center, center, "");
+  height: 50px;
+  width: 100%;
 }
 
-.guestNameInput{
-    @include flexBox('', left, center, 0);
+.button {
+  @include flexBox("", center, center, 10);
+  @include fontStyle(18px, $black, 700);
+  border-radius: 50px;
+  height: 100%;
+  width: 160px;
+  padding: 12px 25px;
+  color: $white;
+  border: none;
+  cursor: pointer;
+  transition: 222ms ease-in-out;
+  &:hover {
+    opacity: 0.9;
+    transform: scale(1.04)
+  }
+  img {
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.messageButtonBackgroundBlue {
+  background-color: $accent;
+}
+
+.deleteButtonBackground {
+  background-color: $warn;
+}
+
+.editSaveButtons {
+  @include flexBox("", center, center, 10);
+}
+
+.editAccountText {
+  @include flexBox("", left, center, 20);
+  height: 30px;
+  width: 100%;
+  img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.editInput {
+  @include flexBox(column, "", "", 15);
+  height: 90px;
+  width: 100%;
+  input {
+    @include fontStyle(18px, $grey, 500);
     width: 100%;
     height: 50px;
     border-radius: 30px;
-    border: 1px solid #ADB0D9;
-    padding: 0 20px;
-    padding-right: 0;
-    overflow: hidden;
-    .guestPrefix{
-      @include fontStyle(18px, #474747, 700);
-      flex-shrink: 0;
-    }
-    input{
-      border: none;
-      border-radius: 0 30px 30px 0;
-      padding: 15px 4px;
-      height: 100%;
-    }
+    border: 1px solid $main1;
+    padding: 15px 20px;
+  }
 }
 
-.editButton{
-    @include flexBox('', center, center, '');
-    height: 50px;
-    width: 140px;
-    border-radius: 50px;
-    padding: 12px 25px;
-    cursor: pointer;
-}
-
-.stopButton{
-    @include fontStyle(18px, #444DF2, 700);
-    background-color: white;
-    border: 1px solid #797ef3;
-    &:hover{
-        background-color: #444DF2;
-        color: white;
-    }
-}
-
-.saveButton{
-    background-color: #444DF2;
-    @include fontStyle(18px, white, 700);
+.guestNameInput {
+  @include flexBox("", left, center, 0);
+  width: 100%;
+  height: 50px;
+  border-radius: 30px;
+  border: 1px solid $main1;
+  padding: 0 20px;
+  padding-right: 0;
+  overflow: hidden;
+  .guestPrefix {
+    @include fontStyle(18px, $grey, 700);
+    flex-shrink: 0;
+  }
+  input {
     border: none;
-    &:hover{
-        opacity: 0.8;
-    }
+    border-radius: 0 30px 30px 0;
+    padding: 15px 4px;
+    height: 100%;
+  }
 }
 
-@media(max-width: 600px){
-    .editIconShow{
-        @include flexBox("", center, center, "");
-        height: 40px;
-        width: 40px;
-        background-color: white;
-        border: none;
-        border-radius: 50%;
-        &:hover{
-            background-color: #ECEEFE;
-        }
-    }
-
-    .nameEdit{
-        a{
-            display: none;
-        }
-    }
-
-    section{
-        width: 95%;
-        right: auto;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        &.small {
-            top: 50%;
-            right: auto;
-            border-radius: 30px;
-        }
-    }
+.editButton {
+  @include flexBox("", center, center, "");
+  height: 50px;
+  width: 140px;
+  border-radius: 50px;
+  padding: 12px 25px;
+  cursor: pointer;
 }
 
-@media(max-width: 450px){
-    section{
-        &.small, 
-        &.big
-         {
-            padding: 30px 24px;
-        }
-    }
-    img{
-        height: 160px;
-        width: 160px;
-    }
-}
-@media(max-width: 350px){
-    .editSaveButtons{
-        @include flexBox(column-reverse, center, center, 15);
-    }
+.stopButton {
+  @include fontStyle(18px, $accent, 700);
+  background-color: $white;
+  border: 1px solid $main2;
+  &:hover {
+    background-color: $accent;
+    color: $white;
+  }
 }
 
+.saveButton {
+  background-color: $accent;
+  @include fontStyle(18px, white, 700);
+  border: none;
+  &:hover {
+    opacity: 0.8;
+  }
+}
 
+@media (max-width: 600px) {
+  .editIconShow {
+    @include flexBox("", center, center, "");
+    height: 40px;
+    width: 40px;
+    background-color: $white;
+    border: none;
+    border-radius: 50%;
+    &:hover {
+      background-color: $main1;
+    }
+  }
+
+  .nameEdit {
+    a {
+      display: none;
+    }
+  }
+
+  section {
+    width: 95%;
+    right: auto;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    &.small {
+      top: 50%;
+      right: auto;
+      border-radius: 30px;
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  section {
+    &.small,
+    &.big {
+      padding: 30px 24px;
+    }
+  }
+  img {
+    height: 160px;
+    width: 160px;
+  }
+}
+@media (max-width: 350px) {
+  .editSaveButtons {
+    @include flexBox(column-reverse, center, center, 15);
+  }
+}

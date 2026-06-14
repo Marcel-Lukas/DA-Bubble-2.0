@@ -7,7 +7,7 @@ main{
 .directMessageButton{
     @include flexBox('', left, center, 13);
     width: 260px;
-    background-color: white;
+    background-color: $white;
     border: none;
     cursor: pointer;
 }
@@ -16,10 +16,11 @@ main{
 .directMessageButton:hover .showMessagesIcon,
 .directMessageButton:hover h2
 {
-    color: #535AF1;
+    color: $accent;
 }
 .accountCircle{
-    font-size: 24px
+    font-size: 24px;
+    color: $black;
 }
 .directMessage{
     @include flexBox('', space-between, center, 10);
@@ -28,11 +29,12 @@ main{
     @include flexBox('', center, center, '');
     width: 32px;
     height: 32px;
-    background-color: white;
+    background-color: $white;
     border: none;
 }
 .showMessagesIcon{
-    font-size: 30px
+    font-size: 30px;
+    color: $black;
 }
 section{
     @include flexBox(column, center, left, 13);
@@ -47,11 +49,14 @@ section{
     width: 270px;
     padding-left: 16px;
     border-radius: 30px;
-    background-color: white;
+    background-color: $white;
     border: none;
     cursor: pointer;
+    span{
+        color: $black;
+    }
     &:hover{
-        background-color: #ECEEFE;
+        background-color: $main1;
     }    
 }
 .userImage{

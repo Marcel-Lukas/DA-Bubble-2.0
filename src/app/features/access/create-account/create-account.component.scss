@@ -6,14 +6,14 @@
 }
 
 .arrow {
-  @include mixin.arrow($bg-color: vari.$sky-grey, $icon-color: vari.$purple);
+  @include mixin.arrow($bg-color: vari.$main1, $icon-color: vari.$accent);
 }
 
 form {
   @include mixin.dFlex($gap: 30px, $direction: column);
 
   > h1 {
-    @include mixin.accHead(vari.$dark-blue);
+    @include mixin.accHead(vari.$accent);
   }
 
   > p {
@@ -26,7 +26,7 @@ form {
 }
 
 .input-container {
-  @include mixin.errMess($text-color: vari.$rose);
+  @include mixin.errMess($text-color: vari.$warn);
 }
 
 .btn-container {

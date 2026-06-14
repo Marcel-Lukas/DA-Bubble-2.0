@@ -6,8 +6,19 @@ header {
   height: 100%;
 }
 
-img {
-  width: 240px;
+.logo {
+  @include flexBox("", center, center, 0);
+  transform: translate(0, 0) scale(1);
+  img {
+    width: 70px;
+  }
+  > span {
+    font-size: 32px;
+    font-weight: bold;
+    margin-left: 10px;
+    text-wrap: nowrap;
+    color: $black;
+  }
 }
 
 app-search-bar {
@@ -20,20 +31,20 @@ app-device-visible {
   margin-left: 96px;
 }
 
-@media (max-width: 999px) {
-    header{
-        padding-inline: 12px
-    }
 
+
+@media (max-width: 999px) {
+  header{
+    padding-inline: 12px
+  }
   .messageInWorkspace {
     @include flexBox("", space-between, center, 10);
     height: 50px;
     margin-left: -8px
   }
-
   button {
     @include flexBox("", space-between, center, 2);
-    background-color: #eceefe;
+    background-color: $main1;
     cursor: pointer;
     border: none;
     img {
@@ -41,28 +52,36 @@ app-device-visible {
       width: 50px;
     }
   }
-
   .arrowLeft {
     font-size: 32px;
   }
-
   button:hover .arrowLeft {
-    color: #535af1;
+    color: $accent;
   }
 }
+
+
+@media (max-width: 700px) {
+  .logo {
+    > img {
+      width: clamp(48px, calc(40px + 30 * (100vw - 350px) / 350), 70px);
+      height: clamp(48px, calc(40px + 30 * (100vw - 350px) / 350), 70px);
+    }
+    > span {
+      font-size: clamp(20px, calc(16px + 8 * (100vw - 350px) / 350), 24px);
+    }
+  }
+}
+
+
 @media (max-width: 600px) {
   header {
     @include flexBox("", space-between, center, 0);
-    padding-inline: 0px;
+    padding-inline: 12px;
   }
-  
   app-device-visible{
     width: 0px;
     margin-left: 0px;
   }
 }
-@media (max-width: 450px) {
-  img {
-    width: 200px;
-  }
-}
+

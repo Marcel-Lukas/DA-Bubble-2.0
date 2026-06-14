@@ -5,7 +5,7 @@ form {
   @include mixin.dFlex($gap: clamp(12px, 2.5vw, 30px), $direction: column);
 
   > h1 {
-    @include mixin.accHead(vari.$dark-blue);
+    @include mixin.accHead(vari.$accent);
   }
 
   > p {
@@ -15,7 +15,7 @@ form {
 }
 
 .input-container {
-  @include mixin.errMess($text-color: vari.$rose);
+  @include mixin.errMess($text-color: vari.$warn);
 }
 
 .or-container {
@@ -33,7 +33,7 @@ form {
 
   &::before {
     content: "";
-    background-color: #adb0d9;
+    background-color: vari.$main1;
     height: 1px;
     width: 100%;
     position: absolute;

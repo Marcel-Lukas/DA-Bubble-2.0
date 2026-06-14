@@ -8,11 +8,11 @@
 }
 
 .arrow {
-  @include mixin.arrow($bg-color: vari.$sky-grey, $icon-color: vari.$purple);
+  @include mixin.arrow($bg-color: vari.$main1, $icon-color: vari.$accent);
 }
 
 h1 {
-  @include mixin.accHead(vari.$dark-blue);
+  @include mixin.accHead(vari.$accent);
 }
 
 .content {

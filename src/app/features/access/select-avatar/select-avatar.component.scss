@@ -7,8 +7,8 @@
 
 .arrow {
   @include mixin.arrow(
-    $bg-color: vari.$sky-grey,
-    $icon-color: vari.$purple
+    $bg-color: vari.$main1,
+    $icon-color: vari.$accent
   );
 }
 
@@ -17,7 +17,7 @@
 }
 
 h1 {
-  @include mixin.accHead(vari.$dark-blue);
+  @include mixin.accHead(vari.$accent);
 }
 
 .selected-avatar {
@@ -49,12 +49,12 @@ span {
     transition: border-color 0.3s ease;
 
     &:hover {
-      border: 5px solid vari.$gainsboro;
+      border: 5px solid vari.$main2;
     }
   }
 
   > img.selected {
-    border: 5px solid vari.$sky-grey;
+    border: 5px solid vari.$main1;
   }
 }
 
