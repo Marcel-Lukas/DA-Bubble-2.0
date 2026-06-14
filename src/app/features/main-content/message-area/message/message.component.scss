@@ -41,9 +41,11 @@ section.thread:not(.row-reverse)  {
 }
 
 section.thread:not(.row-reverse) {
+  overflow: visible;
   emoji-mart {
     top: 90px;
     left: -100px;
+    max-height: 290px;
   }
 }
 
