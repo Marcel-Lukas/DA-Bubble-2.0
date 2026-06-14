@@ -44,8 +44,9 @@ section.thread:not(.row-reverse) {
   overflow: visible;
   emoji-mart {
     top: 90px;
-    left: -100px;
+    left: -90px;
     max-height: 290px;
+    max-width: 298px;
   }
 }
 
@@ -424,7 +425,7 @@ emoji-mart {
 
 @media (max-width: 365px) {
   emoji-mart {
-    max-width: 300px;
+    max-width: 298px;
   }
 }
 
