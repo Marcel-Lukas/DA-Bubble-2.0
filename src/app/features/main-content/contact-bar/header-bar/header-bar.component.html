@@ -1,17 +1,22 @@
 <header>
     <section>
-        <div class="logoText">
-            <img src="assets/img/workspaceLogo.png">
-            <h1>Devspace</h1>
-        </div>
+        <img src="assets/img/workspaceLogo.png">
+        <h1>Devspace</h1>
         <button class="squareImage">
             <div class="material-symbols icon" (click)="openNewChat()">edit_square</div>
         </button>
     </section>
+
+    <app-device-visible mode="tabletBig">
+        <button (click)="openNewChat(); someAction()" class="squareImageNewPosition">
+            <div class="material-symbols icon">edit_square</div>
+        </button>
+    </app-device-visible>
 </header>
-<app-device-visible mode="tabletBig">
+
+<!-- <app-device-visible mode="tabletBig">
     <button (click)="openNewChat(); someAction()" class="squareImageNewPosition">
         <div class="material-symbols icon">edit_square</div>
     </button>
-</app-device-visible>
+</app-device-visible> -->
 

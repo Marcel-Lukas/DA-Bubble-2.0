@@ -38,7 +38,6 @@ header {
 }
 
 .workSpaceIcon,
-.addIcon,
 .hashtagIcon {
   font-size: 24px;
   color: $black;
@@ -47,7 +46,7 @@ header {
 .channelHeadShow:hover .workSpaceIcon,
 .channelHeadShow:hover .showChannelsIcon,
 .channelHeadShow:hover h2,
-.addButton:hover .addIcon,
+.addButton:hover,
 .addChannel:hover span,
 .everyChannel:hover span,
 .everyChannel:hover .hashtagIcon {
