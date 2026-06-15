@@ -53,10 +53,19 @@ app-device-visible {
     }
   }
   .arrowLeft {
-    font-size: 32px;
+    font-size: 48px;
+    margin-right: 6px;
+    border-radius: 50%;
+    padding: 18px;
+    color: $main2;
+    background-color: $white;
+    cursor: pointer;
+    transition: all 222ms ease-in-out;
   }
   button:hover .arrowLeft {
     color: $accent;
+    background-color: $main1;
+    transform: scale(1.3)
   }
 }
 
