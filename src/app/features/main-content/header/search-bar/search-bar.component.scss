@@ -12,18 +12,19 @@
 .search-bar-wrapper {
   position: relative;
   height: 100%;
-  border-radius: 42px;
+  border-radius: 20px;
   border: none;
   z-index: 1;
   max-width: 960px;
   height: 70px;
   z-index: 49;
+  box-shadow: 2px 2px 16px 2px rgba(0, 0, 0, 0.3);
 }
 
 app-search-information {
   position: absolute;
   top: 72px;
-  left: -30px;
+  left: 0;
   width: 100%;
   z-index: 30;
 }
@@ -75,28 +76,35 @@ input:focus {
   outline: 2px solid vari.$main2;
 }
 
+
+
 @media (max-width: 1450px) {
   .searchButton {
     right: 24px;
   }
-
   input {
     padding: 18px 24px;
   }
 }
 
+
 @media (max-width: 1000px) {
-  input {
+  .search-bar-wrapper {
     height: 56px;
-    border: 1px solid vari.$main1;
   }
-
   .searchButton {
-    top: 12px;
-    height: 35px;
+    top: 11px;
+    height: 34px;
   }
+}
 
-  main {
-    height: 60px;
+
+@media (max-width: 450px) {
+  .search-bar-wrapper {
+    border-radius: 8px;
+  }
+  input {
+    border-radius: 8px;
+    padding: 16px;
   }
 }
